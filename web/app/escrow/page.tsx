@@ -6,7 +6,7 @@ export default function EscrowPage() {
     {
       number: '01',
       title: 'คุณจองและชำระเงิน',
-      description: 'เมื่อคุณยืนยันการจองและชำระเงิน เงินทั้งหมด (ค่าบริการ + ค่าธรรมเนียม malAI) จะถูกโอนเข้าบัญชี Escrow ที่ธนาคารกสิกรไทย',
+      description: 'เมื่อคุณยืนยันการจองและชำระเงิน เงินทั้งหมด (ค่าบริการ + ค่าธรรมเนียม phithiai) จะถูกโอนเข้าบัญชี Escrow ที่ธนาคารกสิกรไทย',
       details: [
         'เงินจะไม่ถูกโอนให้พาร์ทเนอร์ทันที',
         'คุณได้รับใบเสร็จและการยืนยันทันที',
@@ -18,7 +18,7 @@ export default function EscrowPage() {
     {
       number: '02',
       title: 'เงินถูกเก็บไว้อย่างปลอดภัย',
-      description: 'เงินของคุณจะถูกเก็บไว้ในบัญชี Escrow แยกต่างหาก ไม่สามารถนำไปใช้ในกิจการของ malAI หรือพาร์ทเนอร์ได้',
+      description: 'เงินของคุณจะถูกเก็บไว้ในบัญชี Escrow แยกต่างหาก ไม่สามารถนำไปใช้ในกิจการของ phithiai หรือพาร์ทเนอร์ได้',
       details: [
         'บัญชี Escrow ที่ธนาคารกสิกรไทย สาขาสีลม',
         'เลขที่บัญชี: 123-4-56789-0',
@@ -35,7 +35,7 @@ export default function EscrowPage() {
       details: [
         'คุณสามารถติดตามสถานะได้ real-time',
         'แจ้งปัญหาได้ทันทีหากมีอะไรผิดปกติ',
-        'ทีม malAI คอยตรวจสอบและช่วยเหลือ'
+        'ทีม phithiai คอยตรวจสอบและช่วยเหลือ'
       ],
       icon: Users,
       color: 'purple'
@@ -58,7 +58,7 @@ export default function EscrowPage() {
       description: 'เมื่อคุณยืนยันความพึงพอใจหรือพ้นระยะเวลา 14 วัน เงินจะถูกโอนให้พาร์ทเนอร์ (หัก ณ ที่จ่ายตามกฎหมาย)',
       details: [
         'พาร์ทเนอร์ได้รับเงิน 90% ของค่าบริการ',
-        'malAI ได้รับค่าธรรมเนียม 10%',
+        'phithiai ได้รับค่าธรรมเนียม 10%',
         'ออกใบเสร็จ/ใบกำกับภาษีให้ทั้งสองฝ่าย'
       ],
       icon: FileCheck,
@@ -75,7 +75,7 @@ export default function EscrowPage() {
     },
     {
       scenario: 'งานไม่ตรงตามสัญญา',
-      action: 'ทีม malAI ไกล่เกลี่ย และคืนเงินตามส่วน',
+      action: 'ทีม phithiai ไกล่เกลี่ย และคืนเงินตามส่วน',
       timeline: 'ภายใน 14 วันหลังร้องเรียน',
       color: 'orange'
     },
@@ -223,13 +223,13 @@ export default function EscrowPage() {
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl">
                 <p className="text-sm opacity-75 mb-2">ชื่อบัญชี</p>
-                <p className="text-xl font-semibold">malAI Escrow Account</p>
+                <p className="text-xl font-semibold">phithiai Escrow Account</p>
               </div>
             </div>
             <div className="mt-6 bg-white/20 backdrop-blur-sm p-4 rounded-xl">
               <p className="text-sm">
                 <strong>ข้อมูลสำคัญ:</strong> บัญชีนี้เป็นบัญชีเงินค่ำประกัน (Escrow Account) 
-                ที่แยกจากบัญชีธุรกิจของ malAI เงินในบัญชีนี้ไม่สามารถนำไปใช้ในกิจการได้ 
+                ที่แยกจากบัญชีธุรกิจของ phithiai เงินในบัญชีนี้ไม่สามารถนำไปใช้ในกิจการได้ 
                 และถูกตรวจสอบโดย PwC Thailand ทุกไตรมาส
               </p>
             </div>
@@ -306,7 +306,7 @@ export default function EscrowPage() {
                 </summary>
                 <div className="p-4 text-gray-800/70 text-sm">
                   เงินจะยังคงอยู่ในบัญชี Escrow จนกว่าจะมีการไกล่เกลี่ยหรือตัดสินข้อพิพาทเสร็จสิ้น 
-                  ทีม malAI จะทำหน้าที่เป็นคนกลางและพิจารณาหลักฐานจากทั้งสองฝ่ายอย่างยุติธรรม
+                  ทีม phithiai จะทำหน้าที่เป็นคนกลางและพิจารณาหลักฐานจากทั้งสองฝ่ายอย่างยุติธรรม
                 </div>
               </details>
 
@@ -315,7 +315,7 @@ export default function EscrowPage() {
                   มีค่าธรรมเนียมเพิ่มเติมสำหรับ Escrow ไหม?
                 </summary>
                 <div className="p-4 text-gray-800/70 text-sm">
-                  ไม่มีครับ ค่าบริการ Escrow รวมอยู่ในค่าธรรมเนียม malAI 10% แล้ว 
+                  ไม่มีครับ ค่าบริการ Escrow รวมอยู่ในค่าธรรมเนียม phithiai 10% แล้ว 
                   ไม่มีค่าธรรมเนียมซ่อนเร้นหรือค่าใช้จ่ายเพิ่มเติมใดๆ
                 </div>
               </details>
@@ -325,7 +325,7 @@ export default function EscrowPage() {
                   ตรวจสอบสถานะเงินในบัญชี Escrow ได้ไหม?
                 </summary>
                 <div className="p-4 text-gray-800/70 text-sm">
-                  ได้ครับ คุณสามารถเข้าดูสถานะเงินของคุณได้ตลอดเวลาผ่านแดชบอร์ดใน malAI Platform 
+                  ได้ครับ คุณสามารถเข้าดูสถานะเงินของคุณได้ตลอดเวลาผ่านแดชบอร์ดใน phithiai Platform 
                   และเราจะส่งการแจ้งเตือนทุกครั้งที่มีการเคลื่อนไหวของเงิน
                 </div>
               </details>
@@ -338,7 +338,7 @@ export default function EscrowPage() {
               มั่นใจได้ว่าเงินของคุณปลอดภัย
             </h3>
             <p className="text-gray-800/70 mb-6">
-              จองบริการกับ malAI วันนี้ พร้อมการคุ้มครองด้วยระบบ Escrow
+              จองบริการกับ phithiai วันนี้ พร้อมการคุ้มครองด้วยระบบ Escrow
             </p>
             <div className="flex justify-center gap-4">
               <a href="/vendors" className="bg-amber-600 text-white px-8 py-4 rounded-lg hover:bg-amber-700 transition font-semibold">

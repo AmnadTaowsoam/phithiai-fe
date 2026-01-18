@@ -7,7 +7,7 @@ const articles = [
     id: 'article-1',
     title: '10 สิ่งที่ต้องเตรียมสำหรับงานแต่งงานไทย',
     excerpt: 'เตรียมตัวให้พร้อมสำหรับวันสำคัญด้วยเช็กลิสต์ครบครันที่คัดสรรมาเป็นพิเศษ...',
-    author: 'ทีมงาน malAI',
+    author: 'ทีมงาน phithiai',
     date: '2025-01-10',
     category: 'คู่มือ',
     image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80'

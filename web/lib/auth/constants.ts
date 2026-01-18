@@ -1,5 +1,5 @@
 export const authCookieNames = {
-  accessToken: 'malai_access_token',
-  refreshToken: 'malai_refresh_token',
+  accessToken: 'phithiai_access_token',
+  refreshToken: 'phithiai_refresh_token',
 } as const;
 

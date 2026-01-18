@@ -137,7 +137,7 @@ export const AuspiciousPlanner = ({ initialData }: AuspiciousPlannerProps) => {
           ) : null}
         </form>
         <p className="text-xs text-ivory/50">
-          Data trained on Thai royal almanac, monk advisories, and malAI lunar archives.
+          Data trained on Thai royal almanac, monk advisories, and phithiai lunar archives.
         </p>
       </div>
       <div className="space-y-6">

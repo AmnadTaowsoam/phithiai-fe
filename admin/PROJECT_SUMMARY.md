@@ -1,4 +1,4 @@
-# malAI Admin Portal - Project Summary
+# phithiai Admin Portal - Project Summary
 
 ## ✅ สิ่งที่สร้างเสร็จแล้ว
 
@@ -243,7 +243,7 @@ frontend/admin/
 
 ### 1. ติดตั้ง Dependencies
 ```bash
-cd D:\Malai\frontend\admin
+cd D:\phithiai\frontend\admin
 yarn install
 ```
 
@@ -300,7 +300,7 @@ yarn dev
 
 ## 🎉 สรุป
 
-สร้าง **Admin Frontend** สำหรับ malAI Platform เสร็จสมบูรณ์แล้ว!
+สร้าง **Admin Frontend** สำหรับ phithiai Platform เสร็จสมบูรณ์แล้ว!
 
 ### ✅ ที่สร้างเสร็จ:
 - ✅ 9 หน้าหลัก (Dashboard, Users, Vendors, Bookings, Disputes, Pricing, Feature Flags, Analytics, Settings)

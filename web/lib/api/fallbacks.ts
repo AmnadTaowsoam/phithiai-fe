@@ -17,7 +17,7 @@ const fallbackVendors: VendorDetail[] = [
     description:
       'งานดอกไม้คูตูร์และการจัดพิธีแบบแช่ตัว ฝังรากในงานฝีมือล้านนา คัดสรรเฉพาะงานฉลองระดับสูง',
     longDescription:
-      'Maison Lanna Collective สานเรื่องราวผ่านศิลปะพฤกษศาสตร์ การจัดแสงสถาปัตยกรรม และการติดตั้งเฉพาะที่ให้เกียรติมรดกล้านนา แต่ละงานถูกจัดการโดยคอนเซียร์จออกแบบเฉพาะและเครื่องมือออเคสเตรชัน malAI เพื่อไทม์ไลน์ที่แม่นยำ',
+      'Maison Lanna Collective สานเรื่องราวผ่านศิลปะพฤกษศาสตร์ การจัดแสงสถาปัตยกรรม และการติดตั้งเฉพาะที่ให้เกียรติมรดกล้านนา แต่ละงานถูกจัดการโดยคอนเซียร์จออกแบบเฉพาะและเครื่องมือออเคสเตรชัน phithiai เพื่อไทม์ไลน์ที่แม่นยำ',
     category: 'decoration',
     zone: 'chiang-mai',
     rating: 4.9,
@@ -33,7 +33,7 @@ const fallbackVendors: VendorDetail[] = [
         price: 185000,
         description: 'ดอกไม้พิธีพร้อมการแสดงตัวอย่างความเป็นจริงเสริมและประสบการณ์น้ำหอมในสถานที่',
         includes: [
-          'การทำแผนที่ดอกไม้แบบโต้ตอบด้วย malAI Vision',
+          'การทำแผนที่ดอกไม้แบบโต้ตอบด้วย phithiai Vision',
           'น้ำตกดอกบัวผูกมือและทางเข้าพิธี',
           'บาร์กลิ่นสดกับช่างน้ำหอมผู้เชี่ยวชาญ',
         ],
@@ -69,7 +69,7 @@ const fallbackVendors: VendorDetail[] = [
       'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80',
     description: 'ชุดผ้าไหมเฉพาะตัว ชุดพิธี และการออกแบบตู้เสื้อผ้ามรดก',
     longDescription:
-      'Silk Atelier คัดสรรคลังเสื้อผ้าที่สวมใส่ได้ เกิดแรงบันดาลใจจากรูปทรงราชวงศ์ไทยและคูตูร์ร่วมสมัย แต่ละชิ้นถูกวัดตัวแบบดิจิทัลด้วย malAI Draper และเสร็จสิ้นด้วยการตกแต่งทอด้วยมือจากสหกรณ์ช่างฝีมือ',
+      'Silk Atelier คัดสรรคลังเสื้อผ้าที่สวมใส่ได้ เกิดแรงบันดาลใจจากรูปทรงราชวงศ์ไทยและคูตูร์ร่วมสมัย แต่ละชิ้นถูกวัดตัวแบบดิจิทัลด้วย phithiai Draper และเสร็จสิ้นด้วยการตกแต่งทอด้วยมือจากสหกรณ์ช่างฝีมือ',
     category: 'attire',
     zone: 'bangkok',
     rating: 4.95,
@@ -86,7 +86,7 @@ const fallbackVendors: VendorDetail[] = [
         description:
           'ชุดขบวนแห่สามแบบพร้อมการจัดสไตล์เครื่องประดับเฉพาะตัวและการวิจัยลวดลายบรรพบุรุษ',
         includes: [
-          'การสแกนร่างกาย 3D ด้วย malAI Draper',
+          'การสแกนร่างกาย 3D ด้วย phithiai Draper',
           'ผ้าดอกไหมทอด้วยมือพร้อมงานทองเฉพาะตัว',
           'การปรึกษาสัญลักษณ์ทางวัฒนธรรมกับนักประวัติศาสตร์ประจำ',
         ],
@@ -129,7 +129,7 @@ const fallbackVendors: VendorDetail[] = [
     description:
       'การกำกับดนตรีเฉพาะตัว วงดนตรีสด และเสียงประกอบด้วย AI สำหรับช่วงเวลาพิธี',
     longDescription:
-      'Siam Symphony คัดสรรการแสดงแบบหลายประสาทสัมผัส ผสมผสานเครื่องดนตรีไทยคลาสสิกกับวงดนตรีสมัยใหม่ malAI Maestro เพิ่มรายการเพลงโดยใช้ข้อมูลการปรับจูนจากงานฉลองก่อนหน้า',
+      'Siam Symphony คัดสรรการแสดงแบบหลายประสาทสัมผัส ผสมผสานเครื่องดนตรีไทยคลาสสิกกับวงดนตรีสมัยใหม่ phithiai Maestro เพิ่มรายการเพลงโดยใช้ข้อมูลการปรับจูนจากงานฉลองก่อนหน้า',
     category: 'entertainment',
     zone: 'bangkok',
     rating: 4.85,
@@ -146,7 +146,7 @@ const fallbackVendors: VendorDetail[] = [
         description: 'การออเคสเตรชันขบวนแห่ คอนเสิร์ตอาหารค่ำ และการให้คะแนนรอบทิศทางแช่ตัว',
         includes: [
           'วงออเคสตร้าห้องไทยพร้อมศิลปินเดี่ยวแขก',
-          'การปรับจูนความรู้สึก malAI Maestro',
+          'การปรับจูนความรู้สึก phithiai Maestro',
           'วิศวกรรมเสียงเชิงพื้นที่พร้อมเสียงสะท้อนวัด',
         ],
         addons: [{ name: 'โปรแกรมผู้ชมเสริมความเป็นจริง', price: 22000 }],
@@ -291,7 +291,7 @@ export const planningChecklistFallback = (): PlanningChecklist =>
         { id: 'cl_3m_02', task: 'ยืนยันรายการอาหารและแพ้อาหารแขก', owner: 'groom' },
       ],
       one_week_before: [
-        { id: 'cl_1w_01', task: 'Final vendor sync ผ่าน malAI Ops', owner: 'planner' },
+        { id: 'cl_1w_01', task: 'Final vendor sync ผ่าน phithiai Ops', owner: 'planner' },
         { id: 'cl_1w_02', task: 'จัดชุดเซอร์ไพรส์สำหรับงานเลี้ยงเย็น', owner: 'bride' },
       ],
       day_of: [
@@ -300,7 +300,7 @@ export const planningChecklistFallback = (): PlanningChecklist =>
       ],
     },
     timeline: [
-      { time: '06:00', activity: 'ทีมมาลายเซ็ตอัพพิธีสงฆ์', owner: 'malai crew' },
+      { time: '06:00', activity: 'ทีมมาลายเซ็ตอัพพิธีสงฆ์', owner: 'phithiai crew' },
       { time: '09:09', activity: 'พิธีหมั้น & รดน้ำสังข์', owner: 'master of ceremony' },
       { time: '18:30', activity: 'งานเลี้ยงค่ำพร้อม performance Siam Symphony', owner: 'music director' },
     ],

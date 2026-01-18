@@ -1,9 +1,9 @@
 export const apiConfig = {
   baseUrl:
     process.env.PHITHIAI_API_URL ??
-    process.env.MALAI_API_URL ??
+    process.env.phithiai_API_URL ??
     process.env.NEXT_PUBLIC_PHITHIAI_API_URL ??
-    process.env.NEXT_PUBLIC_MALAI_API_URL ??
+    process.env.NEXT_PUBLIC_phithiai_API_URL ??
     'http://localhost:3000',
   prefix: 'api',
   timeoutMs: 8000,

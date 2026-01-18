@@ -93,7 +93,7 @@ export const RegisterForm = () => {
     <Card className="mx-auto w-full max-w-md border-ivory/15 bg-background/70 shadow-subtle">
       <CardHeader>
         <CardTitle>Create your account</CardTitle>
-        <CardDescription>Start planning with trusted vendors and malAI guidance.</CardDescription>
+        <CardDescription>Start planning with trusted vendors and phithiai guidance.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-5">

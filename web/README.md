@@ -1,9 +1,9 @@
-﻿# malAI Web Experience
+﻿# phithiai Web Experience
 
-Premium Next.js experience for the malAI platform combining a marketing site, curated vendor marketplace, and AI-assisted planning studio.
+Premium Next.js experience for the phithiai platform combining a marketing site, curated vendor marketplace, and AI-assisted planning studio.
 
 ## Feature Highlights
-- **Magic UI landing** with aurora hero, concierge CTA, and brand storytelling tied to the docs in D:\Malai\docs.
+- **Magic UI landing** with aurora hero, concierge CTA, and brand storytelling tied to the docs in D:\phithiai\docs.
 - **Vendor marketplace** (/vendors, /vendors/[slug]) powered by the public API (GET /vendors, GET /vendors/:id, etc.) with filters, pagination, and graceful fallbacks.
 - **Planning studio** (/plan) offering auspicious date finder, budget estimator, and concierge checklist via server actions backed by the planning endpoints.
 - **Consultation intake** modal wired to /api/consultations with configurable webhook target and notifications for the concierge team.
@@ -11,15 +11,15 @@ Premium Next.js experience for the malAI platform combining a marketing site, cu
 ## Getting Started
 ```bash
 yarn install
-yarn workspace @malai/web-app dev
+yarn workspace @phithiai/web-app dev
 ```
 The dev server runs on http://localhost:3100.
 
 ## Environment Variables
 | Variable | Purpose | Default |
 | --- | --- | --- |
-| `MALAI_API_URL` | Server-side base URL for platform API calls (`https://api.malai.app/api`). | `http://localhost:3000` |
-| `NEXT_PUBLIC_MALAI_API_URL` | Optional client-side override if exposing public API URL. | – |
+| `phithiai_API_URL` | Server-side base URL for platform API calls (`https://api.phithiai.app/api`). | `http://localhost:3000` |
+| `NEXT_PUBLIC_phithiai_API_URL` | Optional client-side override if exposing public API URL. | – |
 | `CONSULTATION_ENDPOINT` | Concierge webhook for `/api/consultations`. | `http://localhost:3014/consultations` |
 | `NEXT_PUBLIC_LOOKBOOK_URL` | Optional link for the signature lookbook download. | – |
 

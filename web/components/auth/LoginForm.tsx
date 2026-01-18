@@ -109,7 +109,7 @@ export const LoginForm = () => {
           </Button>
 
           <p className="text-center text-sm text-ivory/60">
-            New to malAI?{' '}
+            New to phithiai?{' '}
             <Link href="/auth/register" className="text-brand-200 hover:text-brand-100">
               Create an account
             </Link>

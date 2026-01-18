@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useBookingDetail } from '@/hooks/use-booking-detail';
-import { confirmBooking, completeBooking, cancelBooking } from '@malai/api/bookings';
+import { confirmBooking, completeBooking, cancelBooking } from '@phithiai/api/bookings';
 
 const statusCopy: Record<string, string> = {
   pending_deposit: 'Pending Deposit',

@@ -1,4 +1,4 @@
-# Getting Started with malAI Admin Portal
+# Getting Started with phithiai Admin Portal
 
 ## 🚀 Quick Start
 
@@ -6,13 +6,13 @@
 
 - Node.js 20+ installed
 - Yarn package manager
-- Access to malAI Admin Service API
+- Access to phithiai Admin Service API
 
 ### Installation
 
 1. **Navigate to admin directory**
    ```bash
-   cd D:\Malai\frontend\admin
+   cd D:\phithiai\frontend\admin
    ```
 
 2. **Install dependencies**

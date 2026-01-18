@@ -1,4 +1,4 @@
-# malAI LIFF Workspace
+# phithiai LIFF Workspace
 
 Skeleton for the LINE LIFF companion experience that will power concierge chat, booking nudges, and quick vendor actions within LINE.
 
@@ -20,7 +20,7 @@ Skeleton for the LINE LIFF companion experience that will power concierge chat, 
 3. **Integrate with services**  
    - Fetch concierge data from the admin service (`/consultations`, `/vendors`, etc.).  
    - Consume Pack 0 APIs for booking status, vendor responses, and notifications.  
-   - Implement secure login (LIFF auth + JWT exchange with malAI platform).
+   - Implement secure login (LIFF auth + JWT exchange with phithiai platform).
 
 4. **Testing & Deployment**  
    - Add unit tests in `tests/` and consider Playwright/Cypress for smoke tests.  

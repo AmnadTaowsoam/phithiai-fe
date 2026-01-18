@@ -141,7 +141,7 @@ export default function QualityPage() {
     {
       step: '08',
       title: 'Onboarding',
-      description: 'อบรมการใช้งานระบบและนโยบาย malAI',
+      description: 'อบรมการใช้งานระบบและนโยบาย phithiai',
       duration: '1 วัน'
     }
   ];
@@ -157,7 +157,7 @@ export default function QualityPage() {
               มาตรฐานคุณภาพ 48 ข้อ
             </h1>
             <p className="text-xl text-gray-800/80 max-w-3xl mx-auto leading-relaxed">
-              ทุกพาร์ทเนอร์บน malAI ผ่านการตรวจสอบ 48 ข้อที่เข้มงวด 
+              ทุกพาร์ทเนอร์บน phithiai ผ่านการตรวจสอบ 48 ข้อที่เข้มงวด 
               เพื่อให้คุณมั่นใจได้ว่าจะได้รับบริการคุณภาพสูงสุด
             </p>
             <div className="mt-8 inline-flex items-center gap-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-3 rounded-full font-semibold">
@@ -385,7 +385,7 @@ export default function QualityPage() {
                 <div>
                   <h3 className="font-semibold mb-2">การคุ้มครอง</h3>
                   <p className="text-sm opacity-90">
-                    หากเกิดปัญหา คุณได้รับการคุ้มครองจากระบบ Escrow และทีม malAI
+                    หากเกิดปัญหา คุณได้รับการคุ้มครองจากระบบ Escrow และทีม phithiai
                   </p>
                 </div>
               </div>
@@ -398,7 +398,7 @@ export default function QualityPage() {
               พร้อมจองพาร์ทเนอร์คุณภาพสูงแล้วหรือยัง?
             </h3>
             <p className="text-gray-800/70 mb-6">
-              สำรวจพาร์ทเนอร์คัดสรรที่ผ่านมาตรฐาน 48 ข้อของ malAI
+              สำรวจพาร์ทเนอร์คัดสรรที่ผ่านมาตรฐาน 48 ข้อของ phithiai
             </p>
             <a href="/vendors" className="inline-block bg-amber-600 text-white px-8 py-4 rounded-lg hover:bg-amber-700 transition font-semibold">
               ดูพาร์ทเนอร์ทั้งหมด

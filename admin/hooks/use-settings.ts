@@ -25,7 +25,7 @@ interface Settings {
 const defaultSettings: Settings = {
   firstName: 'Admin',
   lastName: 'User',
-  email: 'admin@malai.app',
+  email: 'admin@phithiai.app',
   phone: '+66 812345678',
   avatar: '/avatars/admin.png',
   notifications: {

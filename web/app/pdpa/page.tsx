@@ -23,7 +23,7 @@ export default function PDPAPage() {
               </h2>
               <div className="space-y-3 text-gray-800/80">
                 <p>
-                  malAI ให้ความสำคัญกับการคุ้มครองข้อมูลส่วนบุคคลของคุณตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA) 
+                  phithiai ให้ความสำคัญกับการคุ้มครองข้อมูลส่วนบุคคลของคุณตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA) 
                   เอกสารนี้อธิบายว่าเราเก็บรวบรวม ใช้ และปกป้องข้อมูลส่วนบุคคลของคุณอย่างไร
                 </p>
               </div>
@@ -38,7 +38,7 @@ export default function PDPAPage() {
                 <div className="bg-amber-50 p-4 rounded-lg">
                   <p><strong>บริษัท:</strong> บริษัท มาลัย เทคโนโลยี จำกัด</p>
                   <p><strong>ที่อยู่:</strong> 123 ถนนสุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110</p>
-                  <p><strong>อีเมล:</strong> dpo@malai.app</p>
+                  <p><strong>อีเมล:</strong> dpo@phithiai.app</p>
                   <p><strong>โทรศัพท์:</strong> +66 2 123 4567</p>
                 </div>
               </div>
@@ -238,7 +238,7 @@ export default function PDPAPage() {
                   <p className="font-semibold text-gray-800 mb-2">เจ้าหน้าที่คุ้มครองข้อมูลส่วนบุคคล (DPO)</p>
                   <p className="flex items-center gap-2">
                     <Mail className="w-4 h-4" />
-                    <strong>อีเมล:</strong> dpo@malai.app
+                    <strong>อีเมล:</strong> dpo@phithiai.app
                   </p>
                   <p className="flex items-center gap-2">
                     <Phone className="w-4 h-4" />

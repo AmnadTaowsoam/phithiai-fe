@@ -44,7 +44,7 @@
       "@/config/*": [
         "./config/*"
       ],
-      "@malai/api/*": [
+      "@phithiai/api/*": [
         "../web/lib/api/*"
       ]
     }

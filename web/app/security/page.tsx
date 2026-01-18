@@ -115,7 +115,7 @@ export default function SecurityPage() {
               <div className="space-y-3 text-gray-800/80">
                 <p>หากคุณพบช่องโหว่ด้านความปลอดภัย กรุณาแจ้งเราทันทีที่:</p>
                 <div className="bg-red-50 p-4 rounded-lg">
-                  <p><strong>อีเมล:</strong> security@malai.app</p>
+                  <p><strong>อีเมล:</strong> security@phithiai.app</p>
                   <p className="mt-2 text-sm">กรุณาอย่าเปิดเผยช่องโหว่สาธารณะก่อนที่เราจะมีโอกาสแก้ไข เราจะตอบกลับภายใน 48 ชั่วโมง</p>
                 </div>
               </div>
@@ -126,7 +126,7 @@ export default function SecurityPage() {
                 8. มาตรฐานและการรับรอง
               </h2>
               <div className="space-y-3 text-gray-800/80">
-                <p>malAI ปฏิบัติตามมาตรฐานความปลอดภัยระดับสากล:</p>
+                <p>phithiai ปฏิบัติตามมาตรฐานความปลอดภัยระดับสากล:</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div className="bg-amber-50 p-4 rounded-lg">
                     <p className="font-semibold text-gray-800">ISO 27001</p>
@@ -155,7 +155,7 @@ export default function SecurityPage() {
               <div className="space-y-3 text-gray-800/80">
                 <p>หากคุณมีคำถามเกี่ยวกับความปลอดภัย กรุณาติดต่อทีมของเราที่:</p>
                 <div className="bg-amber-50 p-4 rounded-lg">
-                  <p><strong>อีเมล:</strong> security@malai.app</p>
+                  <p><strong>อีเมล:</strong> security@phithiai.app</p>
                   <p><strong>โทรศัพท์ฉุกเฉิน:</strong> +66 2 123 4567 (ตลอด 24 ชั่วโมง)</p>
                 </div>
               </div>

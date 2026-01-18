@@ -19,7 +19,7 @@ export default function FeesPage() {
           {/* Main Fee Structure */}
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
             <h2 className="text-3xl font-semibold text-gray-800 mb-6">
-              ค่าธรรมเนียมบริการ malAI
+              ค่าธรรมเนียมบริการ phithiai
             </h2>
             <div className="bg-gradient-to-br from-amber-500 to-amber-600 text-white p-8 rounded-xl mb-6">
               <div className="text-center">
@@ -42,7 +42,7 @@ export default function FeesPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600 mt-1">✓</span>
-                    <span>Malai Copilot™ AI Assistant</span>
+                    <span>phithiai Copilot™ AI Assistant</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600 mt-1">✓</span>
@@ -121,7 +121,7 @@ export default function FeesPage() {
                     <span className="font-semibold">50,000 บาท</span>
                   </div>
                   <div className="flex justify-between text-amber-600">
-                    <span>ค่าธรรมเนียม malAI (10%):</span>
+                    <span>ค่าธรรมเนียม phithiai (10%):</span>
                     <span className="font-semibold">5,000 บาท</span>
                   </div>
                   <div className="flex justify-between text-gray-500">
@@ -134,7 +134,7 @@ export default function FeesPage() {
                   </div>
                 </div>
                 <p className="text-xs text-gray-800/60 mt-3">
-                  * พาร์ทเนอร์ได้รับ 50,000 บาท | malAI ได้รับ 5,350 บาท (รวม VAT)
+                  * พาร์ทเนอร์ได้รับ 50,000 บาท | phithiai ได้รับ 5,350 บาท (รวม VAT)
                 </p>
               </div>
 
@@ -146,7 +146,7 @@ export default function FeesPage() {
                     <span className="font-semibold">500,000 บาท</span>
                   </div>
                   <div className="flex justify-between text-amber-600">
-                    <span>ค่าธรรมเนียม malAI (10%):</span>
+                    <span>ค่าธรรมเนียม phithiai (10%):</span>
                     <span className="font-semibold">50,000 บาท</span>
                   </div>
                   <div className="flex justify-between text-gray-500">
@@ -159,7 +159,7 @@ export default function FeesPage() {
                   </div>
                 </div>
                 <p className="text-xs text-gray-800/60 mt-3">
-                  * พาร์ทเนอร์ได้รับ 500,000 บาท | malAI ได้รับ 53,500 บาท (รวม VAT)
+                  * พาร์ทเนอร์ได้รับ 500,000 บาท | phithiai ได้รับ 53,500 บาท (รวม VAT)
                 </p>
               </div>
             </div>
@@ -202,9 +202,9 @@ export default function FeesPage() {
             </h2>
             <div className="space-y-4">
               <div className="bg-amber-50 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 mb-2">ใบกำกับภาษีจาก malAI</h3>
+                <h3 className="font-semibold text-gray-800 mb-2">ใบกำกับภาษีจาก phithiai</h3>
                 <p className="text-sm text-gray-800/70">
-                  คุณจะได้รับใบกำกับภาษีจาก malAI สำหรับ<strong>ค่าธรรมเนียมบริการ 10%</strong> เท่านั้น 
+                  คุณจะได้รับใบกำกับภาษีจาก phithiai สำหรับ<strong>ค่าธรรมเนียมบริการ 10%</strong> เท่านั้น 
                   (เช่น ในตัวอย่างที่ 1: ใบกำกับภาษีจำนวน 5,350 บาท รวม VAT)
                 </p>
               </div>
@@ -239,7 +239,7 @@ export default function FeesPage() {
                 <CheckCircle className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
                 <div>
                   <p className="font-semibold text-gray-800">ยกเลิกมากกว่า 30 วันก่อนงาน</p>
-                  <p className="text-sm text-gray-800/70">คืนเงิน 100% (รวมค่าธรรมเนียม malAI)</p>
+                  <p className="text-sm text-gray-800/70">คืนเงิน 100% (รวมค่าธรรมเนียม phithiai)</p>
                 </div>
               </div>
 
@@ -247,7 +247,7 @@ export default function FeesPage() {
                 <CheckCircle className="w-5 h-5 text-yellow-600 mt-1 flex-shrink-0" />
                 <div>
                   <p className="font-semibold text-gray-800">ยกเลิก 15-30 วันก่อนงาน</p>
-                  <p className="text-sm text-gray-800/70">คืนเงิน 50% (คืนค่าธรรมเนียม malAI 100%)</p>
+                  <p className="text-sm text-gray-800/70">คืนเงิน 50% (คืนค่าธรรมเนียม phithiai 100%)</p>
                 </div>
               </div>
 
@@ -262,7 +262,7 @@ export default function FeesPage() {
               <div className="bg-blue-50 p-4 rounded-lg mt-4">
                 <p className="text-sm text-blue-800">
                   <strong>💡 ข้อควรทราบ:</strong> หากพาร์ทเนอร์ไม่สามารถให้บริการได้ 
-                  คุณจะได้รับเงินคืน 100% (รวมค่าธรรมเนียม malAI) ผ่านระบบ Escrow ภายใน 7 วันทำการ
+                  คุณจะได้รับเงินคืน 100% (รวมค่าธรรมเนียม phithiai) ผ่านระบบ Escrow ภายใน 7 วันทำการ
                 </p>
               </div>
             </div>
@@ -309,7 +309,7 @@ export default function FeesPage() {
             <div className="space-y-4">
               <details className="group">
                 <summary className="cursor-pointer font-semibold text-gray-800 p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
-                  ทำไมต้องจ่ายค่าธรรมเนียม malAI 10%?
+                  ทำไมต้องจ่ายค่าธรรมเนียม phithiai 10%?
                 </summary>
                 <div className="p-4 text-gray-800/70 text-sm">
                   ค่าธรรมเนียม 10% ครอบคลุมบริการครบวงจร: การคัดสรรพาร์ทเนอร์คุณภาพ, ระบบ Escrow, 
@@ -324,7 +324,7 @@ export default function FeesPage() {
                 </summary>
                 <div className="p-4 text-gray-800/70 text-sm">
                   ได้ครับ หากยกเลิกมากกว่า 30 วันก่อนงาน คุณจะได้เงินคืน 100% 
-                  หากยกเลิก 15-30 วันก่อนงาน จะได้เงินคืน 50% (แต่ได้ค่าธรรมเนียม malAI คืน 100%) 
+                  หากยกเลิก 15-30 วันก่อนงาน จะได้เงินคืน 50% (แต่ได้ค่าธรรมเนียม phithiai คืน 100%) 
                   รายละเอียดในนโยบายการคืนเงินด้านบน
                 </div>
               </details>
@@ -334,7 +334,7 @@ export default function FeesPage() {
                   ฉันจะได้ใบกำกับภาษีไหม?
                 </summary>
                 <div className="p-4 text-gray-800/70 text-sm">
-                  คุณจะได้ใบกำกับภาษี 2 ใบ: (1) จาก malAI สำหรับค่าธรรมเนียม 10%, 
+                  คุณจะได้ใบกำกับภาษี 2 ใบ: (1) จาก phithiai สำหรับค่าธรรมเนียม 10%, 
                   (2) จากพาร์ทเนอร์สำหรับค่าบริการ กรุณาแจ้งพาร์ทเนอร์หากต้องการใบกำกับภาษีสำหรับค่าบริการ
                 </div>
               </details>

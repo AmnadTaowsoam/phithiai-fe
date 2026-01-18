@@ -37,7 +37,7 @@ export default function InvitationPage() {
       confirmedCount: 120,
       declinedCount: 15,
       viewCount: 145,
-      shareLink: 'https://malai.app/i/abc123'
+      shareLink: 'https://phithiai.app/i/abc123'
     }
   ]);
 

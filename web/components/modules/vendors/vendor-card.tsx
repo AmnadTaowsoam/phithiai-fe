@@ -54,7 +54,7 @@ export const VendorCard = ({ vendor }: VendorCardProps) => (
           {vendor.reviewCount
             ? `${formatNumber(vendor.reviewCount)} verified reviews`
             : vendor.verified
-              ? 'malAI verified'
+              ? 'phithiai verified'
               : 'Awaiting reviews'}
         </span>
         {vendor.startingPrice ? (

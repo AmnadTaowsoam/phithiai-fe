@@ -5,8 +5,8 @@ import {
   confirmBooking,
   completeBooking,
   cancelBooking,
-} from '@malai/api/bookings';
-import type { BookingRecord } from '@malai/api/types';
+} from '@phithiai/api/bookings';
+import type { BookingRecord } from '@phithiai/api/types';
 
 const defaultBookings: Booking[] = [];
 

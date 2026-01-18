@@ -1,6 +1,6 @@
-﻿# malAI Admin Portal
+﻿# phithiai Admin Portal
 
-Admin dashboard for managing the malAI event platform.
+Admin dashboard for managing the phithiai event platform.
 
 ## 🚀 Features
 
@@ -259,7 +259,7 @@ NEXT_PUBLIC_ENABLE_DEBUG=false
 
 ## 📄 License
 
-Proprietary - malAI Platform
+Proprietary - phithiai Platform
 
 ---
 

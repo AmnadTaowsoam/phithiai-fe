@@ -160,7 +160,7 @@ export const CustomerSupportBadge = () => {
         <Users className="w-5 h-5 text-red-600" />
         <div>
           <p className="font-semibold text-red-900">ทีมช่วยเหลือ 24/7</p>
-          <p className="text-xs text-red-700">โทร: +66 2 123 4567 · LINE: @malAI</p>
+          <p className="text-xs text-red-700">โทร: +66 2 123 4567 · LINE: @phithiai</p>
         </div>
       </div>
     </div>

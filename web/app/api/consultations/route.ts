@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        source: 'malai-web',
+        source: 'phithiai-web',
         ...data,
         submittedAt: new Date().toISOString(),
       }),

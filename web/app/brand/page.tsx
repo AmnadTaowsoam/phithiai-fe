@@ -12,17 +12,17 @@ export default function BrandPage() {
               Brand Guidelines
             </h1>
             <p className="text-lg text-gray-800/80">
-              คู่มือการใช้งานแบรนด์ malAI
+              คู่มือการใช้งานแบรนด์ phithiai
             </p>
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-8 space-y-8">
             <section>
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                เกี่ยวกับแบรนด์ malAI
+                เกี่ยวกับแบรนด์ phithiai
               </h2>
               <div className="space-y-3 text-gray-800/80">
-                <p>malAI เป็นแพลตฟอร์มที่ผสมผสานความงดงามของพิธีกรรมไทยเข้ากับเทคโนโลยีสมัยใหม่ แบรนด์ของเราสะท้อนถึงความหรูหรา ความเป็นไทย และนวัตกรรม</p>
+                <p>phithiai เป็นแพลตฟอร์มที่ผสมผสานความงดงามของพิธีกรรมไทยเข้ากับเทคโนโลยีสมัยใหม่ แบรนด์ของเราสะท้อนถึงความหรูหรา ความเป็นไทย และนวัตกรรม</p>
               </div>
             </section>
 
@@ -88,18 +88,18 @@ export default function BrandPage() {
                 3. โลโก้
               </h2>
               <div className="space-y-4 text-gray-800/80">
-                <p>โลโก้ malAI มี 3 เวอร์ชัน:</p>
+                <p>โลโก้ phithiai มี 3 เวอร์ชัน:</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-gray-900 p-6 rounded-lg text-center">
-                    <div className="text-white text-3xl font-display mb-2">malAI</div>
+                    <div className="text-white text-3xl font-display mb-2">phithiai</div>
                     <p className="text-sm text-gray-300">Full Color</p>
                   </div>
                   <div className="bg-white border-2 p-6 rounded-lg text-center">
-                    <div className="text-gray-900 text-3xl font-display mb-2">malAI</div>
+                    <div className="text-gray-900 text-3xl font-display mb-2">phithiai</div>
                     <p className="text-sm text-gray-600">Light Background</p>
                   </div>
                   <div className="bg-gray-900 p-6 rounded-lg text-center">
-                    <div className="text-white text-3xl font-display mb-2">malAI</div>
+                    <div className="text-white text-3xl font-display mb-2">phithiai</div>
                     <p className="text-sm text-gray-300">Dark Background</p>
                   </div>
                 </div>
@@ -147,7 +147,7 @@ export default function BrandPage() {
                 5. Tone of Voice
               </h2>
               <div className="space-y-3 text-gray-800/80">
-                <p>การสื่อสารของ malAI ควร:</p>
+                <p>การสื่อสารของ phithiai ควร:</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li><strong>มีความเป็นมืออาชีพ:</strong> ใช้ภาษาที่สุภาพและเป็นทางการ</li>
                   <li><strong>เป็นมิตร:</strong> อบอุ่นและเข้าถึงได้</li>
@@ -199,7 +199,7 @@ export default function BrandPage() {
               <div className="space-y-3 text-gray-800/80">
                 <p>หากคุณมีคำถามเกี่ยวกับการใช้งานแบรนด์ กรุณาติดต่อ:</p>
                 <div className="bg-amber-50 p-4 rounded-lg">
-                  <p><strong>อีเมล:</strong> brand@malai.app</p>
+                  <p><strong>อีเมล:</strong> brand@phithiai.app</p>
                   <p><strong>โทรศัพท์:</strong> +66 2 123 4567</p>
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 
 export const NotificationPanel = () => {
-  const wsUrl = useMemo(() => process.env.NEXT_PUBLIC_PHITHIAI_WS_URL ?? process.env.NEXT_PUBLIC_MALAI_WS_URL, []);
+  const wsUrl = useMemo(() => process.env.NEXT_PUBLIC_PHITHIAI_WS_URL ?? process.env.NEXT_PUBLIC_phithiai_WS_URL, []);
   const { messages } = useWebSocket(wsUrl);
   const notifications = messages.filter((m) => m.type.startsWith('notification.'));
 

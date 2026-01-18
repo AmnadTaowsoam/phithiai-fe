@@ -55,7 +55,7 @@
   {/* User Info - ซ่อนบนหน้าจอเล็ก */}
   <div className="text-right hidden sm:block">
     <p className="text-sm font-medium">Admin User</p>
-    <p className="text-xs text-muted-foreground">admin@malai.app</p>
+    <p className="text-xs text-muted-foreground">admin@phithiai.app</p>
   </div>
   
   {/* User Icon Button */}

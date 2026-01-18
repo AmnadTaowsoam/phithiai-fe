@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { BookingRecord, GuestRecord, RsvpSummary, PaymentIntent } from '@malai/api/types';
-import { getBookingById } from '@malai/api/bookings';
-import { getGuestsForBooking, getRSVPSummary, importRSVPEntries } from '@malai/api/guests';
-import { listPaymentIntents } from '@malai/api/payments';
+import type { BookingRecord, GuestRecord, RsvpSummary, PaymentIntent } from '@phithiai/api/types';
+import { getBookingById } from '@phithiai/api/bookings';
+import { getGuestsForBooking, getRSVPSummary, importRSVPEntries } from '@phithiai/api/guests';
+import { listPaymentIntents } from '@phithiai/api/payments';
 
 interface BookingDetailState {
   booking: BookingRecord | null;

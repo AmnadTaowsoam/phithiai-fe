@@ -140,7 +140,7 @@ export const ChecklistGenerator = ({ initialData }: ChecklistGeneratorProps) => 
             <p className="text-ivory/60">Generate a checklist to view the timeline milestones.</p>
           )}
           <p className="text-xs text-ivory/50">
-            malAI syncs these activities to Magic UI Workspace and vendor dashboards automatically.
+            phithiai syncs these activities to Magic UI Workspace and vendor dashboards automatically.
           </p>
         </div>
       </div>

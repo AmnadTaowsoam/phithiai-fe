@@ -9,7 +9,7 @@ import { GlassCard } from '@/components/ui/glass-card';
 const modules = [
   {
     Icon: IconMessageChatbot,
-    title: 'Malai Copilot™',
+    title: 'phithiai Copilot™',
     description:
       'นักออกแบบพิธี AI แบบสนทนา พร้อมรองรับภาษาไทยและอังกฤษ ระบบเลือกวันมงคล และสคริปต์ที่สอดคล้องกับวัฒนธรรม',
     outcomes: ['คำแนะนำวันมงคล', 'พิธีกรรมส่วนตัว', 'การปกป้องวัฒนธรรม'],
@@ -24,7 +24,7 @@ const modules = [
   {
     Icon: IconChecklist,
     title: 'คอนโซลพาร์ทเนอร์คอนเซียร์จ',
-    description: 'เจรจา อนุมัติ และติดตามงานส่งมอบในพื้นที่ปลอดภัยที่ตรวจสอบโดยผู้ตรวจสอบคุณภาพ malAI',
+    description: 'เจรจา อนุมัติ และติดตามงานส่งมอบในพื้นที่ปลอดภัยที่ตรวจสอบโดยผู้ตรวจสอบคุณภาพ phithiai',
     outcomes: ['ห้องเก็บสัญญา', 'ตรวจสอบคุณภาพขั้นตอน', 'ความพร้อมแบบสด'],
   },
   {
@@ -39,7 +39,7 @@ const modules = [
 export const PlatformSuite = () => (
   <section id="platform" className="container space-y-14 py-24">
     <div className="mx-auto max-w-3xl space-y-6 text-center">
-      <p className="text-xs uppercase tracking-[0.35em] text-brand-200/80">ชุดแพลตฟอร์ม malAI</p>
+      <p className="text-xs uppercase tracking-[0.35em] text-brand-200/80">ชุดแพลตฟอร์ม phithiai</p>
       <h2 className="font-display text-4xl text-ivory md:text-5xl thai-heading-md">
         สแต็กออเคสเตรชันระดับพรีเมียม สร้างสำหรับพิธีสำคัญ
       </h2>
