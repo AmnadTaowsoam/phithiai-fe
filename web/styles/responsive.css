@@ -1,0 +1,17 @@
+/* Minimal responsive utilities specific to malAI web */
+
+@media (max-width: 640px) {
+  .thai-heading {
+    letter-spacing: 0.03em !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+

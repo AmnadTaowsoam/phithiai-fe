@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import './responsive.css';
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sarabun), var(--font-inter), 'Inter Variable', sans-serif;
+  @apply bg-background text-gray-900 antialiased;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(212, 175, 55, 0.12), transparent 55%),
+    radial-gradient(circle at 85% 15%, rgba(80, 200, 120, 0.15), transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(139, 69, 19, 0.2), transparent 60%);
+  min-height: 100vh;
+}
+
+.font-display {
+  font-family: var(--font-playfair), var(--font-charm), serif;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+
+/* ปรับ spacing สำหรับตัวอักษรไทย */
+.font-display h1,
+.font-display h2,
+.font-display h3 {
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+}
+
+/* ปรับ spacing สำหรับข้อความยาว */
+.font-display p {
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+/* Class พิเศษสำหรับหัวข้อไทยที่ยาว */
+.thai-heading {
+  line-height: 1.6 !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em;
+}
+
+/* Class สำหรับหัวข้อไทยขนาดกลาง */
+.thai-heading-md {
+  line-height: 1.5 !important;
+  letter-spacing: 0.04em !important;
+  word-spacing: 0.08em;
+}
+
+/* Class สำหรับข้อความไทยทั่วไป */
+.thai-text {
+  line-height: 1.7 !important;
+  letter-spacing: 0.02em !important;
+  word-spacing: 0.05em;
+}
+
+::selection {
+  background: rgba(212, 175, 55, 0.35);
+  color: #0d0a09;
+}
+
+.glass-panel {
+  @apply bg-surface/80 backdrop-blur-2xl border border-brand-500/20 shadow-glow;
+}
+
+.lotus-panel {
+  @apply bg-gradient-lotus border border-white/10 shadow-subtle backdrop-blur-xl;
+}
+
+.emerald-ring {
+  box-shadow: inset 0 0 0 1px rgba(80, 200, 120, 0.45);
+}
+
+.dash-divider {
+  @apply h-px w-full bg-gradient-to-r from-transparent via-brand-500/60 to-transparent;
+}
