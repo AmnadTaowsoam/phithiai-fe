@@ -11,153 +11,67 @@ import {
   budgetEstimateSchema,
   planningChecklistSchema,
 } from './schema';
-import { planningFallbacks } from './fallbacks';
 
-const fallbackEventTypes = [
-  { value: 'wedding', label: 'งานแต่งงาน', icon: '💒' },
-  { value: 'ordination', label: 'งานบวช', icon: '🧘' },
-  { value: 'funeral', label: 'งานศพ', icon: '🕊️' },
-  { value: 'housewarming', label: 'งานขึ้นบ้านใหม่', icon: '🏠' },
-  { value: 'merit', label: 'งานทำบุญ', icon: '🙏' },
-];
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const fallbackPlanningModes = [
-  { value: 'astrology', label: 'โหมดโหร', icon: '🔮', description: 'คำนวณเต็มรูปแบบ' },
-  { value: 'moderate', label: 'โหมดกลาง', icon: '⚖️', description: 'ดูเฉพาะฤกษ์สำคัญ' },
-  { value: 'simple', label: 'โหมดง่าย', icon: '✨', description: 'เลือกเฉพาะวันดี' },
-];
-
-const fallbackEventLevels = [
-  { value: 'budget', label: 'ประหยัด', icon: '💰' },
-  { value: 'standard', label: 'มาตรฐาน', icon: '💎' },
-  { value: 'premium', label: 'พรีเมียม', icon: '👑' },
-];
-
-const fallbackVenueTypes = [
-  { value: 'home', label: 'บ้าน/วัด', icon: '🏠' },
-  { value: 'hotel', label: 'โรงแรม', icon: '🏨' },
-  { value: 'outdoor', label: 'กลางแจ้ง', icon: '🌳' },
-  { value: 'resort', label: 'รีสอร์ท', icon: '🏖️' },
-];
-
-const fallbackProvinces = [
-  { code: '10', name: 'กรุงเทพมหานคร', name_en: 'Bangkok' },
-  { code: '50', name: 'เชียงใหม่', name_en: 'Chiang Mai' },
-  { code: '83', name: 'ภูเก็ต', name_en: 'Phuket' },
-];
-
-const fallbackDistricts: Record<string, Array<{ code: string; name: string }>> = {
-  '10': [
-    { code: '1001', name: 'พระนคร' },
-    { code: '1002', name: 'ดุสิต' },
-  ],
-  '50': [
-    { code: '5001', name: 'เมืองเชียงใหม่' },
-    { code: '5002', name: 'จอมทอง' },
-  ],
-};
-
-const fallbackSubdistricts: Record<string, Array<{ code: string; name: string; postcode?: string }>> = {
-  '1001': [
-    { code: '100101', name: 'พระบรมมหาราชวัง', postcode: '10200' },
-    { code: '100102', name: 'วังบูรพาภิรมย์', postcode: '10200' },
-  ],
-  '5001': [
-    { code: '500101', name: 'ศรีภูมิ', postcode: '50200' },
-    { code: '500102', name: 'พระสิงห์', postcode: '50200' },
-  ],
-};
-
-const safeFetch = async <T>(
+const fetchWithRetry = async <T>(
   path: string,
   schema: z.ZodType<T>,
-  fallback: () => T | Promise<T>,
-  options: Omit<ApiFetchOptions<T, T>, 'schema'> = {},
+  options: Omit<ApiFetchOptions<T, unknown>, 'schema'> = {},
 ) => {
-  const attempt = async () => apiFetch<T, T>(path, { schema, fallback, ...options });
-
   try {
-    return await attempt();
-  } catch (_error) {
-    // Retry once for transient failures (timeouts/network)
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    try {
-      return await attempt();
-    } catch (_retryError) {
-      return fallback();
-    }
+    return await apiFetch<T, any>(path, { schema, ...options } as any);
+  } catch (error) {
+    await sleep(250);
+    return await apiFetch<T, any>(path, { schema, ...options } as any);
   }
 };
 
 export class PlanningAPI {
   static async getEventTypes() {
-    return safeFetch(
-      apiRoutes.planning.eventTypes,
-      z.array(optionWithIconSchema),
-      () => fallbackEventTypes,
-      {
-        selector: (envelope) => (envelope.data as any)?.eventTypes,
-      }
-    );
+    return fetchWithRetry(apiRoutes.planning.eventTypes, z.array(optionWithIconSchema), {
+      selector: (envelope) => (envelope.data as any)?.eventTypes,
+    });
   }
 
   static async getPlanningModes() {
-    return safeFetch(
-      apiRoutes.planning.planningModes,
-      z.array(optionWithIconSchema),
-      () => fallbackPlanningModes,
-      {
-        selector: (envelope) => (envelope.data as any)?.planningModes,
-      }
-    );
+    return fetchWithRetry(apiRoutes.planning.planningModes, z.array(optionWithIconSchema), {
+      selector: (envelope) => (envelope.data as any)?.planningModes,
+    });
   }
 
   static async getEventLevels() {
-    return safeFetch(
-      apiRoutes.planning.eventLevels,
-      z.array(optionWithIconSchema),
-      () => fallbackEventLevels,
-      {
-        selector: (envelope) => (envelope.data as any)?.eventLevels,
-      }
-    );
+    return fetchWithRetry(apiRoutes.planning.eventLevels, z.array(optionWithIconSchema), {
+      selector: (envelope) => (envelope.data as any)?.eventLevels,
+    });
   }
 
   static async getVenueTypes() {
-    return safeFetch(
-      apiRoutes.planning.venueTypes,
-      z.array(optionWithIconSchema),
-      () => fallbackVenueTypes,
-      {
-        selector: (envelope) => (envelope.data as any)?.venueTypes,
-      }
-    );
+    return fetchWithRetry(apiRoutes.planning.venueTypes, z.array(optionWithIconSchema), {
+      selector: (envelope) => (envelope.data as any)?.venueTypes,
+    });
   }
 
   static async getProvinces() {
-    return safeFetch(apiRoutes.planning.provinces, z.array(provinceSchema), () => fallbackProvinces, {
+    return fetchWithRetry(apiRoutes.planning.provinces, z.array(provinceSchema), {
       selector: (envelope) => (envelope.data as any)?.provinces,
     });
   }
 
   static async getDistricts(provinceCode: string) {
     if (!provinceCode) return [];
-    return safeFetch(
-      apiRoutes.planning.districts,
-      z.array(districtSchema),
-      () => fallbackDistricts[provinceCode] ?? [],
-      { query: { province: provinceCode }, selector: (envelope) => (envelope.data as any)?.districts },
-    );
+    return fetchWithRetry(apiRoutes.planning.districts, z.array(districtSchema), {
+      query: { province: provinceCode },
+      selector: (envelope) => (envelope.data as any)?.districts,
+    });
   }
 
   static async getSubdistricts(districtCode: string) {
     if (!districtCode) return [];
-    return safeFetch(
-      apiRoutes.planning.subdistricts,
-      z.array(subdistrictSchema),
-      () => fallbackSubdistricts[districtCode] ?? [],
-      { query: { district: districtCode }, selector: (envelope) => (envelope.data as any)?.subdistricts },
-    );
+    return fetchWithRetry(apiRoutes.planning.subdistricts, z.array(subdistrictSchema), {
+      query: { district: districtCode },
+      selector: (envelope) => (envelope.data as any)?.subdistricts,
+    });
   }
 
   static async calculateAuspicious(payload: Record<string, unknown>) {
@@ -165,7 +79,6 @@ export class PlanningAPI {
       method: 'POST',
       schema: auspiciousPlanningSchema,
       body: payload,
-      fallback: planningFallbacks.auspicious,
       selector: (envelope) => {
         const dates = (envelope.data as any)?.dates ?? [];
         const toStars = (score: number) => {
@@ -199,7 +112,6 @@ export class PlanningAPI {
       method: 'POST',
       schema: budgetEstimateSchema,
       body: payload,
-      fallback: planningFallbacks.budget,
       selector: (envelope) => {
         const estimate = (envelope.data as any)?.estimate;
         const median = typeof estimate?.total === 'number' ? estimate.total : 0;
@@ -240,7 +152,6 @@ export class PlanningAPI {
       method: 'POST',
       schema: planningChecklistSchema,
       body: payload,
-      fallback: planningFallbacks.checklist,
       selector: (envelope) => {
         const tasks = (envelope.data as any)?.checklist ?? [];
         const grouped: Record<string, Array<{ id: string; task: string; completed?: boolean; owner?: string }>> = {};

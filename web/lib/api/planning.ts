@@ -18,7 +18,6 @@ import {
   type ChecklistAnalytics,
   type ChecklistTaskV1,
 } from './schema';
-import { planningFallbacks } from './fallbacks';
 
 export type AuspiciousRequest = {
   eventType: string;
@@ -34,7 +33,6 @@ export const generateAuspiciousDates = (payload: AuspiciousRequest) =>
     method: 'POST',
     schema: auspiciousPlanningSchema,
     body: payload,
-    fallback: planningFallbacks.auspicious,
   });
 
 export type BudgetEstimateRequest = {
@@ -49,7 +47,6 @@ export const estimateBudget = (payload: BudgetEstimateRequest) =>
     method: 'POST',
     schema: budgetEstimateSchema,
     body: payload,
-    fallback: planningFallbacks.budget,
   });
 
 export type ChecklistRequest = {
@@ -63,18 +60,12 @@ export const generateChecklist = (payload: ChecklistRequest) =>
     method: 'POST',
     schema: planningChecklistSchema,
     body: payload,
-    fallback: planningFallbacks.checklist,
   });
 
 export const getCeremonyTemplate = (type: string) =>
   apiFetch<CeremonyTemplate, CeremonyTemplate>(apiRoutes.planning.v1.template(type), {
     method: 'GET',
     schema: ceremonyTemplateSchema,
-    fallback: () =>
-      ({
-        key: type,
-        name: type,
-      }) as CeremonyTemplate,
   });
 
 export type TimelineRequest = {

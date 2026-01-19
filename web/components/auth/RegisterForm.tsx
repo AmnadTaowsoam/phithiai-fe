@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { register as registerApi, type AuthSession } from '@/lib/api/auth';
+import { toUiErrorMessage } from '@/lib/api/ui-errors';
 import { setClientAuthTokens } from '@/lib/auth';
 
 const registerSchema = z
@@ -82,8 +83,8 @@ export const RegisterForm = () => {
       setClientAuthTokens(session.accessToken, session.refreshToken);
       router.replace('/dashboard');
       router.refresh();
-    } catch (error: any) {
-      setSubmitError(error?.message ?? 'Registration failed. Please try again.');
+    } catch (error) {
+      setSubmitError(toUiErrorMessage(error, 'Registration failed. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -172,4 +173,3 @@ export const RegisterForm = () => {
     </Card>
   );
 };
-

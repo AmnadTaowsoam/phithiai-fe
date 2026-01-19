@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createPaymentIntent } from '@/lib/api/payments';
+import { toUiErrorMessage } from '@/lib/api/ui-errors';
 import { getMe } from '@/lib/api/users';
 import { getClientAccessToken } from '@/lib/auth';
 
@@ -72,8 +73,8 @@ export const PaymentForm = (props?: { bookingId?: string; vendorId?: string; ini
         setQrCode(intent.qrCode);
       }
       setResult(`Created payment intent: ${intent.id} (${intent.status})`);
-    } catch (e: any) {
-      setError(e?.message ?? 'Failed to create payment intent');
+    } catch (error) {
+      setError(toUiErrorMessage(error, 'Failed to create payment intent'));
     } finally {
       setLoading(false);
     }

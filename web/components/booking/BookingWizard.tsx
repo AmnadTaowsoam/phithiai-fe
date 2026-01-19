@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import type { VendorSummary } from '@/lib/api';
 import { createBooking } from '@/lib/api/bookings';
+import { toUiErrorMessage } from '@/lib/api/ui-errors';
 import { getClientAccessToken } from '@/lib/auth';
 import { calculateDeposit, type BookingDraft } from '@/lib/booking';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PaymentForm } from '@/components/booking/PaymentForm';
 
 const draftSchema = z.object({
   vendorId: z.string().min(1),
@@ -105,9 +105,10 @@ export const BookingWizard = ({ vendors }: Props) => {
       };
 
       const result = await createBooking(accessToken, bookingDraft);
-      router.push(`/booking/${result.booking.id}`);
-    } catch (e: any) {
-      setError(e?.message ?? 'Failed to create booking.');
+      router.push(`/payment?bookingId=${encodeURIComponent(result.booking.id)}`);
+      router.refresh();
+    } catch (error) {
+      setError(toUiErrorMessage(error, 'Failed to create booking.'));
     } finally {
       setCreating(false);
     }
@@ -129,21 +130,36 @@ export const BookingWizard = ({ vendors }: Props) => {
             <CardDescription>Choose who you want to book.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="vendor">Vendor</Label>
-              <select
-                id="vendor"
-                value={draft.vendorId}
-                onChange={(e) => setDraft((d) => ({ ...d, vendorId: e.target.value }))}
-                className="h-11 w-full rounded-2xl border border-ivory/15 bg-background/90 px-4 text-sm text-ivory outline-none"
-              >
-                {vendors.map((vendor) => (
-                  <option key={vendor.id} value={vendor.id}>
-                    {vendor.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {vendors.length ? (
+              <div className="space-y-2">
+                <Label htmlFor="vendor">Vendor</Label>
+                <select
+                  id="vendor"
+                  value={draft.vendorId}
+                  onChange={(e) => setDraft((d) => ({ ...d, vendorId: e.target.value }))}
+                  className="h-11 w-full rounded-2xl border border-ivory/15 bg-background/90 px-4 text-sm text-ivory outline-none"
+                >
+                  {vendors.map((vendor) => (
+                    <option key={vendor.id} value={vendor.id}>
+                      {vendor.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="vendorId">Vendor ID</Label>
+                <p className="text-sm text-ivory/60">
+                  Vendor search is unavailable right now. Paste a vendor ID to continue.
+                </p>
+                <Input
+                  id="vendorId"
+                  value={draft.vendorId}
+                  onChange={(e) => setDraft((d) => ({ ...d, vendorId: e.target.value }))}
+                  placeholder="vendor_..."
+                />
+              </div>
+            )}
             <div className="flex justify-end">
               <Button onClick={goNext} disabled={!draft.vendorId}>
                 Continue
@@ -288,35 +304,30 @@ export const BookingWizard = ({ vendors }: Props) => {
       ) : null}
 
       {step === 5 ? (
-        <div className="space-y-6">
-          <Card className="border-ivory/10 bg-background/70">
-            <CardHeader>
-              <CardTitle>Confirm & create booking</CardTitle>
-              <CardDescription>Review and submit to the booking service.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-sm text-ivory/70">
-                Vendor: {selectedVendor?.name ?? draft.vendorId}
-                <br />
-                Event: {draft.eventType} on {draft.eventDate || '—'}
-                <br />
-                Total: {Number(draft.totalAmount || 0).toLocaleString('th-TH')} THB (deposit {depositAmount.toLocaleString('th-TH')} THB)
-              </div>
-              <div className="flex items-center justify-between">
-                <Button variant="ghost" onClick={goBack}>
-                  Back
-                </Button>
-                <Button onClick={onCreateBooking} disabled={creating}>
-                  {creating ? 'Creating…' : 'Create booking'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <PaymentForm />
-        </div>
+        <Card className="border-ivory/10 bg-background/70">
+          <CardHeader>
+            <CardTitle>Confirm & create booking</CardTitle>
+            <CardDescription>Review and submit to the booking service.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-sm text-ivory/70">
+              Vendor: {selectedVendor?.name ?? draft.vendorId}
+              <br />
+              Event: {draft.eventType} on {draft.eventDate || '—'}
+              <br />
+              Total: {Number(draft.totalAmount || 0).toLocaleString('th-TH')} THB (deposit {depositAmount.toLocaleString('th-TH')} THB)
+            </div>
+            <div className="flex items-center justify-between">
+              <Button variant="ghost" onClick={goBack}>
+                Back
+              </Button>
+              <Button onClick={onCreateBooking} disabled={creating}>
+                {creating ? 'Creating…' : 'Create booking & pay'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       ) : null}
     </div>
   );
 };
-

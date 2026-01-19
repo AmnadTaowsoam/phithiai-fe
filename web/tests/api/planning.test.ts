@@ -8,19 +8,15 @@ import { apiFetch } from '@/lib/api/http';
 import { PlanningAPI } from '@/lib/api/planning-api';
 
 describe('PlanningAPI', () => {
-  it('returns fallbacks when request fails twice', async () => {
+  it('retries once when request fails', async () => {
     vi.useFakeTimers();
     vi.mocked(apiFetch).mockRejectedValueOnce(new Error('network down')).mockRejectedValueOnce(new Error('still down'));
 
     const promise = PlanningAPI.getEventTypes();
+    const expectation = expect(promise).rejects.toThrow(/still down/i);
     await vi.advanceTimersByTimeAsync(260);
 
-    await expect(promise).resolves.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ value: 'wedding' }),
-        expect.objectContaining({ value: 'ordination' }),
-      ]),
-    );
+    await expectation;
     expect(vi.mocked(apiFetch)).toHaveBeenCalledTimes(2);
     vi.useRealTimers();
   });

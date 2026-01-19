@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { login as loginApi, type AuthSession } from '@/lib/api/auth';
+import { toUiErrorMessage } from '@/lib/api/ui-errors';
 import { setClientAuthTokens } from '@/lib/auth';
 
 const loginSchema = z.object({
@@ -57,8 +58,8 @@ export const LoginForm = () => {
       setClientAuthTokens(session.accessToken, session.refreshToken);
       router.replace(nextPath);
       router.refresh();
-    } catch (error: any) {
-      setSubmitError(error?.message ?? 'Login failed. Please try again.');
+    } catch (error) {
+      setSubmitError(toUiErrorMessage(error, 'Login failed. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -119,4 +120,3 @@ export const LoginForm = () => {
     </Card>
   );
 };
-

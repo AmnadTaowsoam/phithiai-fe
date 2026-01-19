@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 262 83% 58%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 262 83% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* LINE LIFF specific styles */
+.liff-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.liff-header {
+  @apply sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b;
+}
+
+.liff-nav {
+  @apply flex items-center justify-between p-4;
+}
+
+.liff-nav-item {
+  @apply flex flex-col items-center gap-1 text-xs text-gray-600;
+}
+
+.liff-nav-item.active {
+  @apply text-purple-600;
+}
+
+.liff-card {
+  @apply bg-white rounded-xl shadow-sm border p-4;
+}
+
+.liff-button {
+  @apply w-full py-3 px-4 rounded-lg font-medium transition-colors;
+}
+
+.liff-button-primary {
+  @apply bg-purple-600 text-white hover:bg-purple-700;
+}
+
+.liff-button-secondary {
+  @apply bg-gray-100 text-gray-900 hover:bg-gray-200;
+}
+
+.liff-button-outline {
+  @apply border border-gray-300 text-gray-700 hover:bg-gray-50;
+}
+
+.liff-input {
+  @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent;
+}
+
+.liff-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.liff-badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.liff-badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.liff-badge-error {
+  @apply bg-red-100 text-red-800;
+}
+
+.liff-badge-info {
+  @apply bg-blue-100 text-blue-800;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .liff-container {
+    padding: 0.75rem;
+  }
+}

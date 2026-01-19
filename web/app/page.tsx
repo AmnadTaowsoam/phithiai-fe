@@ -7,9 +7,18 @@ import { BookingCTA } from '@/components/sections/cta';
 import { Process } from '@/components/sections/process';
 import { TrustBadges } from '@/components/ui/trust-badges';
 import { getVendors } from '@/lib/api';
+import { toUiErrorMessage } from '@/lib/api/ui-errors';
 
 const HomePage = async () => {
-  const { items: vendors } = await getVendors({ limit: 3, sort: 'recommended' });
+  let vendors: Awaited<ReturnType<typeof getVendors>>['items'] = [];
+  let vendorError: string | null = null;
+
+  try {
+    const result = await getVendors({ limit: 3, sort: 'recommended' });
+    vendors = result.items;
+  } catch (error) {
+    vendorError = toUiErrorMessage(error, 'Unable to load featured vendors right now.');
+  }
 
   return (
     <div className="flex flex-col gap-24 pb-24">
@@ -18,7 +27,7 @@ const HomePage = async () => {
         <TrustBadges />
         <SignatureExperience />
         <Process />
-        <VendorShowcase vendors={vendors} />
+        <VendorShowcase vendors={vendors} errorMessage={vendorError} />
         <PlatformSuite />
         <Testimonials />
         <BookingCTA />

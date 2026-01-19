@@ -12,7 +12,6 @@ import {
   type VendorReview,
   type VendorSummary,
 } from './schema';
-import { vendorCollectionFallback, vendorDetailFallback } from './fallbacks';
 
 export type VendorQuery = {
   keyword?: string;
@@ -100,30 +99,25 @@ export const getVendors = async (query: VendorQuery = {}) => {
         },
       };
     },
-    fallback: vendorCollectionFallback,
     tags: ['vendors'],
   }) as Promise<VendorCollection>;
 };
 
-export const getVendorById = async (idOrSlug: string) =>
-  apiFetch(
-    `${apiRoutes.vendors}/slug/${idOrSlug}`,
-    {
+export const getVendorById = async (idOrSlug: string) => {
+  try {
+    return (await apiFetch(`${apiRoutes.vendors}/slug/${idOrSlug}`, {
       schema: vendorDetailSchema,
       selector: (envelope) => mapVendorSummary((envelope.data as any)?.vendor ?? {}),
-      fallback: async (error) => {
-        try {
-          return await apiFetch(`${apiRoutes.vendors}/${idOrSlug}`, {
-            schema: vendorDetailSchema,
-            selector: (envelope) => mapVendorSummary((envelope.data as any)?.vendor ?? {}),
-          });
-        } catch (fallbackError) {
-          return vendorDetailFallback(idOrSlug, fallbackError);
-        }
-      },
       tags: ['vendors', `vendor:${idOrSlug}`],
-    },
-  ) as Promise<VendorDetail>;
+    })) as VendorDetail;
+  } catch (_slugError) {
+    return (await apiFetch(`${apiRoutes.vendors}/${idOrSlug}`, {
+      schema: vendorDetailSchema,
+      selector: (envelope) => mapVendorSummary((envelope.data as any)?.vendor ?? {}),
+      tags: ['vendors', `vendor:${idOrSlug}`],
+    })) as VendorDetail;
+  }
+};
 
 export const getVendorAvailability = async (id: string, date?: string) =>
   apiFetch(
@@ -131,10 +125,6 @@ export const getVendorAvailability = async (id: string, date?: string) =>
     {
       schema: vendorAvailabilitySchema,
       query: date ? { date } : undefined,
-      fallback: () => ({
-        date: date ?? new Date().toISOString().split('T')[0],
-        available: false,
-      }),
       tags: ['vendors', `vendor:${id}`, 'availability'],
     },
   ) as Promise<VendorAvailability>;
@@ -144,7 +134,6 @@ export const getVendorReviews = async (id: string) =>
     apiRoutes.vendorReviews(id),
     {
       schema: z.array(vendorReviewSchema),
-      fallback: () => [],
       tags: ['vendors', `vendor:${id}`, 'reviews'],
     },
   ) as Promise<VendorReview[]>;

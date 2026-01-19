@@ -6,9 +6,10 @@ import type { VendorSummary } from '@/lib/api';
 
 type VendorShowcaseProps = {
   vendors: VendorSummary[];
+  errorMessage?: string | null;
 };
 
-export const VendorShowcase = ({ vendors }: VendorShowcaseProps) => (
+export const VendorShowcase = ({ vendors, errorMessage }: VendorShowcaseProps) => (
   <section id="vendors" className="container space-y-12 py-24">
     <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div className="max-w-2xl space-y-4">
@@ -27,6 +28,12 @@ export const VendorShowcase = ({ vendors }: VendorShowcaseProps) => (
         </Button>
       </div>
     </div>
+    {errorMessage ? (
+      <div className="rounded-3xl border border-red-500/30 bg-red-500/10 p-6 text-sm text-red-200">
+        {errorMessage}
+      </div>
+    ) : null}
+
     <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
       {vendors.map((vendor) => (
         <GlassCard key={vendor.id} className="overflow-hidden p-0">
@@ -47,12 +54,12 @@ export const VendorShowcase = ({ vendors }: VendorShowcaseProps) => (
           </div>
           <div className="space-y-4 px-6 pb-6 pt-5 text-ivory">
             <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-semibold">{vendor.name}</h3>
+              <div className="min-w-0">
+                <h3 className="truncate text-xl font-semibold">{vendor.name}</h3>
                 <p className="mt-1 text-sm text-ivory/65">{vendor.description}</p>
               </div>
               {vendor.rating ? (
-                <span className="rounded-full border border-brand-500/50 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-200">
+                <span className="shrink-0 rounded-full border border-brand-500/50 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-200">
                   {vendor.rating.toFixed(2)}
                 </span>
               ) : null}
@@ -68,13 +75,9 @@ export const VendorShowcase = ({ vendors }: VendorShowcaseProps) => (
               ))}
             </div>
             <div className="flex items-center justify-between text-sm text-ivory/60">
-              <span>
-                {vendor.reviewCount ? `${vendor.reviewCount} รีวิวที่ตรวจสอบแล้ว` : 'รอรีวิวแรก'}
-              </span>
+              <span>{vendor.reviewCount ? `${vendor.reviewCount} รีวิวที่ตรวจสอบแล้ว` : 'รอรีวิวแรก'}</span>
               {vendor.startingPrice ? (
-                <span className="font-semibold text-brand-200">
-                  {vendor.startingPrice.toLocaleString()} บาท
-                </span>
+                <span className="font-semibold text-brand-200">{vendor.startingPrice.toLocaleString()} บาท</span>
               ) : null}
             </div>
             <Link

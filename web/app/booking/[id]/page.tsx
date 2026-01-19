@@ -37,9 +37,14 @@ export default async function BookingDetailPage({ params }: BookingDetailPagePro
           {booking.eventDate ? <p>Event date: {new Date(booking.eventDate).toLocaleString()}</p> : null}
           {booking.total ? <p>Total: {booking.total.toLocaleString('th-TH')} THB</p> : null}
           <div className="pt-4">
-            <Button as="a" href="/dashboard">
-              Go to dashboard
-            </Button>
+            <div className="flex flex-wrap gap-3">
+              <Button as="a" href={`/payment?bookingId=${encodeURIComponent(booking.id)}`}>
+                Proceed to payment
+              </Button>
+              <Button as="a" href="/dashboard" variant="ghost">
+                Go to dashboard
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
