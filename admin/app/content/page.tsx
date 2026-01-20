@@ -14,76 +14,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Edit, Trash2, Eye, Search } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { useContent, ContentItem } from '@/hooks/use-content';
 
-type ContentType = 'BLOG' | 'HELP_CENTER' | 'FAQ' | 'ANNOUNCEMENT';
-
-type ContentItem = {
-  id: string;
-  title: string;
-  slug: string;
-  type: ContentType;
-  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-  excerpt: string;
-  author: string;
-  publishedAt?: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-const sampleContent: ContentItem[] = [
-  {
-    id: 'cnt_001',
-    title: 'วิธีการจองวอเตอร์สำหรับงานแต่งงาน',
-    slug: 'how-to-book-vendor-wedding',
-    type: 'HELP_CENTER',
-    status: 'PUBLISHED',
-    excerpt: 'คำแนะนำทีละขั้นตอนในการค้นหาและจองวอเตอร์สำหรับงานแต่งงานของคุณ',
-    author: 'Admin',
-    publishedAt: '2026-01-15T10:00:00Z',
-    createdAt: '2026-01-10T10:00:00Z',
-    updatedAt: '2026-01-15T10:00:00Z',
-  },
-  {
-    id: 'cnt_002',
-    title: 'รู้จักกับพิธีไทย: งานบวชพระ',
-    slug: 'thai-ceremony-ordination',
-    type: 'BLOG',
-    status: 'PUBLISHED',
-    excerpt: 'เรียนรู้เกี่ยวกับประเพณีและความเชื่อในพิธีบวชพระ',
-    author: 'Admin',
-    publishedAt: '2026-01-12T10:00:00Z',
-    createdAt: '2026-01-08T10:00:00Z',
-    updatedAt: '2026-01-12T10:00:00Z',
-  },
-  {
-    id: 'cnt_003',
-    title: 'คำถามที่พบบ่อยเกี่ยวกับการชำระเงิน',
-    slug: 'faq-payment',
-    type: 'FAQ',
-    status: 'PUBLISHED',
-    excerpt: 'คำตอบสำหรับคำถามที่พบบ่อยเกี่ยวกับระบบการชำระเงิน',
-    author: 'Admin',
-    publishedAt: '2026-01-10T10:00:00Z',
-    createdAt: '2026-01-05T10:00:00Z',
-    updatedAt: '2026-01-10T10:00:00Z',
-  },
-  {
-    id: 'cnt_004',
-    title: 'อัปเดตระบบใหม่: ฟีเจอร์การวางแผนด้วย AI',
-    slug: 'new-ai-planning-feature',
-    type: 'ANNOUNCEMENT',
-    status: 'DRAFT',
-    excerpt: 'แจ้งเตือนเกี่ยวกับฟีเจอร์ใหม่ที่จะเปิดตัวเร็วๆ นี้',
-    author: 'Admin',
-    createdAt: '2026-01-18T10:00:00Z',
-    updatedAt: '2026-01-18T10:00:00Z',
-  },
-];
-
-const typeLabels: Record<ContentType, string> = {
+const typeLabels: Record<string, string> = {
   BLOG: 'บทความ',
   HELP_CENTER: 'ศูนย์ช่วยเหลือ',
   FAQ: 'คำถามที่พบบ่อย',
@@ -104,38 +40,57 @@ const statusLabels: Record<string, string> = {
 
 export default function ContentManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<ContentType | 'ALL'>('ALL');
+  const [filterType, setFilterType] = useState<string>('ALL');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
-  const [content, setContent] = useState<ContentItem[]>(sampleContent);
-
-  const filteredContent = content.filter((item) => {
-    const matchesSearch =
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = filterType === 'ALL' || item.type === filterType;
-    const matchesStatus = filterStatus === 'ALL' || item.status === filterStatus;
-    return matchesSearch && matchesType && matchesStatus;
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [newContent, setNewContent] = useState({
+    title: '',
+    slug: '',
+    type: 'BLOG' as const,
+    excerpt: '',
   });
 
-  const handlePublish = (id: string) => {
-    setContent((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, status: 'PUBLISHED' as const, publishedAt: new Date().toISOString() }
-          : item
-      )
-    );
+  const { content, loading, error, publishContent, archiveContent, deleteContent, createContent } =
+    useContent(searchQuery, filterType === 'ALL' ? undefined : filterType, filterStatus === 'ALL' ? undefined : filterStatus);
+
+  const handlePublish = async (id: string) => {
+    try {
+      await publishContent(id);
+    } catch (err) {
+      alert('Failed to publish content');
+    }
   };
 
-  const handleArchive = (id: string) => {
-    setContent((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status: 'ARCHIVED' as const } : item))
-    );
+  const handleArchive = async (id: string) => {
+    try {
+      await archiveContent(id);
+    } catch (err) {
+      alert('Failed to archive content');
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('คุณแน่ใจหรือไม่ที่จะลบเนื้อหานี้?')) {
-      setContent((prev) => prev.filter((item) => item.id !== id));
+      try {
+        await deleteContent(id);
+      } catch (err) {
+        alert('Failed to delete content');
+      }
+    }
+  };
+
+  const handleCreate = async () => {
+    try {
+      await createContent(newContent);
+      setShowCreateDialog(false);
+      setNewContent({
+        title: '',
+        slug: '',
+        type: 'BLOG',
+        excerpt: '',
+      });
+    } catch (err: any) {
+      alert(err.message || 'Failed to create content');
     }
   };
 
@@ -145,7 +100,7 @@ export default function ContentManagementPage() {
         title="จัดการเนื้อหา"
         description="จัดการบทความ ศูนย์ช่วยเหลือ และประกาศ"
         actions={
-          <Button>
+          <Button onClick={() => setShowCreateDialog(true)}>
             <Plus className="mr-2 h-4 w-4" />
             เพิ่มเนื้อหาใหม่
           </Button>
@@ -166,7 +121,7 @@ export default function ContentManagementPage() {
           </div>
           <select
             value={filterType}
-            onChange={(e) => setFilterType(e.target.value as ContentType | 'ALL')}
+            onChange={(e) => setFilterType(e.target.value)}
             className="px-3 py-2 border rounded-md text-sm"
           >
             <option value="ALL">ทุกประเภท</option>
@@ -193,90 +148,157 @@ export default function ContentManagementPage() {
 
       {/* Content Table */}
       <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ชื่อเรื่อง</TableHead>
-              <TableHead>ประเภท</TableHead>
-              <TableHead>สถานะ</TableHead>
-              <TableHead>ผู้เขียน</TableHead>
-              <TableHead>วันที่เผยแพร่</TableHead>
-              <TableHead>วันที่อัปเดต</TableHead>
-              <TableHead className="text-right">การดำเนินการ</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredContent.length === 0 ? (
+        {loading ? (
+          <CardContent className="p-6 text-center text-muted-foreground">Loading...</CardContent>
+        ) : error ? (
+          <CardContent className="p-6 text-center text-red-500">{error}</CardContent>
+        ) : (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
-                  <p className="text-muted-foreground">ไม่พบเนื้อหา</p>
-                </TableCell>
+                <TableHead>ชื่อเรื่อง</TableHead>
+                <TableHead>ประเภท</TableHead>
+                <TableHead>สถานะ</TableHead>
+                <TableHead>ผู้เขียน</TableHead>
+                <TableHead>วันที่เผยแพร่</TableHead>
+                <TableHead>วันที่อัปเดต</TableHead>
+                <TableHead className="text-right">การดำเนินการ</TableHead>
               </TableRow>
-            ) : (
-              filteredContent.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-muted-foreground truncate max-w-xs">
-                        {item.excerpt}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{typeLabels[item.type]}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={statusColors[item.status]}>{statusLabels[item.status]}</Badge>
-                  </TableCell>
-                  <TableCell>{item.author}</TableCell>
-                  <TableCell>
-                    {item.publishedAt ? formatDate(item.publishedAt, 'short') : '-'}
-                  </TableCell>
-                  <TableCell>{formatDate(item.updatedAt, 'short')}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      {item.status === 'DRAFT' && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handlePublish(item.id)}
-                          className="text-green-600"
-                        >
-                          เผยแพร่
-                        </Button>
-                      )}
-                      {item.status === 'PUBLISHED' && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleArchive(item.id)}
-                        >
-                          เก็บถาวร
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(item.id)}
-                        className="text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {content.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    <p className="text-muted-foreground">ไม่พบเนื้อหา</p>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                content.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{item.title}</p>
+                        <p className="text-sm text-muted-foreground truncate max-w-xs">
+                          {item.excerpt}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{typeLabels[item.type]}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={statusColors[item.status]}>{statusLabels[item.status]}</Badge>
+                    </TableCell>
+                    <TableCell>{item.author}</TableCell>
+                    <TableCell>
+                      {item.publishedAt ? formatDate(item.publishedAt, 'short') : '-'}
+                    </TableCell>
+                    <TableCell>{formatDate(item.updatedAt, 'short')}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        {item.status === 'DRAFT' && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handlePublish(item.id)}
+                            className="text-green-600"
+                          >
+                            เผยแพร่
+                          </Button>
+                        )}
+                        {item.status === 'PUBLISHED' && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleArchive(item.id)}
+                          >
+                            เก็บถาวร
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(item.id)}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        )}
       </Card>
+
+      {/* Create Content Dialog */}
+      {showCreateDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md p-6">
+            <h3 className="text-lg font-semibold mb-4">เพิ่มเนื้อหาใหม่</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">ชื่อเรื่อง</label>
+                <Input
+                  value={newContent.title}
+                  onChange={(e) => setNewContent({ ...newContent, title: e.target.value })}
+                  placeholder="ชื่อเรื่อง"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Slug</label>
+                <Input
+                  value={newContent.slug}
+                  onChange={(e) => setNewContent({ ...newContent, slug: e.target.value })}
+                  placeholder="slug"
+                  className="font-mono text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">ประเภท</label>
+                <select
+                  value={newContent.type}
+                  onChange={(e) => setNewContent({ ...newContent, type: e.target.value as any })}
+                  className="w-full px-3 py-2 border rounded-md text-sm"
+                >
+                  <option value="BLOG">บทความ</option>
+                  <option value="HELP_CENTER">ศูนย์ช่วยเหลือ</option>
+                  <option value="FAQ">คำถามที่พบบ่อย</option>
+                  <option value="ANNOUNCEMENT">ประกาศ</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">บทสรุป</label>
+                <Textarea
+                  value={newContent.excerpt}
+                  onChange={(e) => setNewContent({ ...newContent, excerpt: e.target.value })}
+                  placeholder="บทสรุปของเนื้อหา"
+                  rows={4}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                ยกเลิก
+              </Button>
+              <Button
+                onClick={handleCreate}
+                disabled={!newContent.title || !newContent.slug || !newContent.excerpt}
+              >
+                สร้างเนื้อหา
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

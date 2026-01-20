@@ -7,7 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Search, Eye, Edit, Shield, Ban, CheckCircle, UserPlus } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { useUserActions } from '@/hooks/use-admin-actions';
+import { Search, UserCheck, UserX, MoreHorizontal } from 'lucide-react';
 import { formatDate, formatRelativeTime } from '@/lib/utils';
 
 type UserRow = {
@@ -15,105 +17,39 @@ type UserRow = {
   email: string;
   name: string;
   role: 'BUYER' | 'VENDOR' | 'ADMIN';
-  status: 'ACTIVE' | 'SUSPENDED' | 'PENDING';
-  phone?: string;
-  avatar?: string;
-  lastLogin?: string;
+  status: 'ACTIVE' | 'SUSPENDED';
   createdAt: string;
-  bookings?: number;
-  totalSpent?: number;
 };
 
 const sampleUsers: UserRow[] = [
-  {
-    id: 'usr_001',
-    email: 'somchai@example.com',
-    name: 'Somchai Jaidee',
-    role: 'BUYER',
-    status: 'ACTIVE',
-    phone: '081-234-5678',
-    lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    bookings: 3,
-    totalSpent: 150000,
-  },
-  {
-    id: 'usr_002',
-    email: 'vendor@example.com',
-    name: 'Maison Lanna',
-    role: 'VENDOR',
-    status: 'ACTIVE',
-    phone: '082-345-6789',
-    lastLogin: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-    bookings: 24,
-    totalSpent: 0,
-  },
-  {
-    id: 'usr_003',
-    email: 'admin@example.com',
-    name: 'Admin User',
-    role: 'ADMIN',
-    status: 'ACTIVE',
-    phone: '083-456-7890',
-    lastLogin: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'usr_004',
-    email: 'nattaya@example.com',
-    name: 'Nattaya Srisuk',
-    role: 'BUYER',
-    status: 'SUSPENDED',
-    phone: '084-567-8901',
-    lastLogin: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
-    bookings: 1,
-    totalSpent: 50000,
-  },
-  {
-    id: 'usr_005',
-    email: 'newuser@example.com',
-    name: 'New User',
-    role: 'BUYER',
-    status: 'PENDING',
-    phone: '085-678-9012',
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-  },
+  { id: 'usr_001', email: 'somchai@example.com', name: 'Somchai Jaidee', role: 'BUYER', status: 'ACTIVE', createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 'usr_002', email: 'vendor@example.com', name: 'Maison Lanna', role: 'VENDOR', status: 'ACTIVE', createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 'usr_003', email: 'admin@example.com', name: 'Admin', role: 'ADMIN', status: 'ACTIVE', createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 'usr_004', email: 'suspended@example.com', name: 'Suspended User', role: 'BUYER', status: 'SUSPENDED', createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString() },
 ];
 
-const roleLabels: Record<string, string> = {
-  BUYER: 'ผู้ใช้งาน',
-  VENDOR: 'วอเตอร์',
-  ADMIN: 'ผู้ดูแลระบบ',
+const roleColors: Record<string, string> = {
+  BUYER: 'bg-blue-100 text-blue-800',
+  VENDOR: 'bg-green-100 text-green-800',
+  ADMIN: 'bg-purple-100 text-purple-800',
 };
 
-const roleColors: Record<string, 'default' | 'secondary' | 'destructive'> = {
-  BUYER: 'default',
-  VENDOR: 'secondary',
-  ADMIN: 'destructive',
-};
-
-const statusLabels: Record<string, string> = {
-  ACTIVE: 'ใช้งานได้',
-  SUSPENDED: 'ระงับการใช้งาน',
-  PENDING: 'รอยืนยัน',
-};
-
-const statusColors: Record<string, 'default' | 'success' | 'destructive' | 'warning'> = {
-  ACTIVE: 'success',
-  SUSPENDED: 'destructive',
-  PENDING: 'warning',
+const statusColors: Record<string, string> = {
+  ACTIVE: 'bg-green-100 text-green-800',
+  SUSPENDED: 'bg-red-100 text-red-800',
 };
 
 export default function AdminUsersPage() {
   const [query, setQuery] = useState('');
   const [filterRole, setFilterRole] = useState<string>('ALL');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
-  const [users, setUsers] = useState(sampleUsers);
-  const [showSuspendDialog, setShowSuspendDialog] = useState(false);
+  const [users, setUsers] = useState<UserRow[]>(sampleUsers);
   const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
-  const [suspendReason, setSuspendReason] = useState('');
+  const [actionReason, setActionReason] = useState('');
+  const [showSuspendDialog, setShowSuspendDialog] = useState(false);
+  const [showUnsuspendDialog, setShowUnsuspendDialog] = useState(false);
+
+  const { suspendUser, unsuspendUser } = useUserActions();
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -121,7 +57,7 @@ export default function AdminUsersPage() {
       const matchesSearch =
         u.email.toLowerCase().includes(q) ||
         u.name.toLowerCase().includes(q) ||
-        u.phone?.toLowerCase().includes(q);
+        u.id.toLowerCase().includes(q);
       const matchesRole = filterRole === 'ALL' || u.role === filterRole;
       const matchesStatus = filterStatus === 'ALL' || u.status === filterStatus;
       return matchesSearch && matchesRole && matchesStatus;
@@ -129,84 +65,67 @@ export default function AdminUsersPage() {
     return filtered;
   }, [query, users, filterRole, filterStatus]);
 
-  const handleSuspend = () => {
-    if (selectedUser && suspendReason.trim()) {
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === selectedUser.id ? { ...u, status: 'SUSPENDED' as const } : u
-        )
-      );
-      setShowSuspendDialog(false);
-      setSuspendReason('');
-      setSelectedUser(null);
+  const handleSuspend = async () => {
+    if (selectedUser && actionReason.trim()) {
+      try {
+        await suspendUser(selectedUser.id, actionReason);
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.id === selectedUser.id ? { ...u, status: 'SUSPENDED' } : u
+          )
+        );
+        setShowSuspendDialog(false);
+        setActionReason('');
+        setSelectedUser(null);
+      } catch (err) {
+        alert('Failed to suspend user');
+      }
     }
   };
 
-  const handleUnsuspend = (id: string) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, status: 'ACTIVE' as const } : u))
-    );
-  };
-
-  const handleActivate = (id: string) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, status: 'ACTIVE' as const } : u))
-    );
+  const handleUnsuspend = async () => {
+    if (selectedUser && actionReason.trim()) {
+      try {
+        await unsuspendUser(selectedUser.id, actionReason);
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.id === selectedUser.id ? { ...u, status: 'ACTIVE' } : u
+          )
+        );
+        setShowUnsuspendDialog(false);
+        setActionReason('');
+        setSelectedUser(null);
+      } catch (err) {
+        alert('Failed to unsuspend user');
+      }
+    }
   };
 
   const activeCount = users.filter((u) => u.status === 'ACTIVE').length;
   const suspendedCount = users.filter((u) => u.status === 'SUSPENDED').length;
-  const pendingCount = users.filter((u) => u.status === 'PENDING').length;
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="จัดการผู้ใช้"
-        description="จัดการบัญชีผู้ใช้และสิทธิ์การเข้าถึง"
-        actions={
-          <Button>
-            <UserPlus className="mr-2 h-4 w-4" />
-            เพิ่มผู้ใช้
-          </Button>
-        }
-      />
+      <PageHeader title="Users" description="Manage user accounts and roles" />
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">ทั้งหมด</p>
-              <p className="text-2xl font-bold">{users.length}</p>
+              <p className="text-sm text-muted-foreground">Active Users</p>
+              <p className="text-2xl font-bold text-green-600">{activeCount}</p>
             </div>
-            <UserPlus className="h-8 w-8 text-gray-500" />
+            <UserCheck className="h-8 w-8 text-green-600" />
           </div>
         </Card>
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">ใช้งานได้</p>
-              <p className="text-2xl font-bold text-green-500">{activeCount}</p>
+              <p className="text-sm text-muted-foreground">Suspended Users</p>
+              <p className="text-2xl font-bold text-red-600">{suspendedCount}</p>
             </div>
-            <CheckCircle className="h-8 w-8 text-green-500" />
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">ระงับการใช้งาน</p>
-              <p className="text-2xl font-bold text-red-500">{suspendedCount}</p>
-            </div>
-            <Ban className="h-8 w-8 text-red-500" />
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">รอยืนยัน</p>
-              <p className="text-2xl font-bold text-yellow-500">{pendingCount}</p>
-            </div>
-            <Shield className="h-8 w-8 text-yellow-500" />
+            <UserX className="h-8 w-8 text-red-600" />
           </div>
         </Card>
       </div>
@@ -217,7 +136,7 @@ export default function AdminUsersPage() {
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="ค้นหาผู้ใช้..."
+              placeholder="Search users..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="pl-10"
@@ -228,24 +147,19 @@ export default function AdminUsersPage() {
             onChange={(e) => setFilterRole(e.target.value)}
             className="px-3 py-2 border rounded-md text-sm"
           >
-            <option value="ALL">ทุกบทบาท</option>
-            {Object.entries(roleLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
+            <option value="ALL">All Roles</option>
+            <option value="BUYER">Buyer</option>
+            <option value="VENDOR">Vendor</option>
+            <option value="ADMIN">Admin</option>
           </select>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="px-3 py-2 border rounded-md text-sm"
           >
-            <option value="ALL">ทุกสถานะ</option>
-            {Object.entries(statusLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
+            <option value="ALL">All Statuses</option>
+            <option value="ACTIVE">Active</option>
+            <option value="SUSPENDED">Suspended</option>
           </select>
         </div>
       </Card>
@@ -255,118 +169,68 @@ export default function AdminUsersPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ชื่อ</TableHead>
-              <TableHead>อีเมล</TableHead>
-              <TableHead>เบอร์โทร</TableHead>
-              <TableHead>บทบาท</TableHead>
-              <TableHead>สถานะ</TableHead>
-              <TableHead>การจอง/ใช้จ่าย</TableHead>
-              <TableHead>เข้าใช้ล่าสุด</TableHead>
-              <TableHead>สมัครเมื่อ</TableHead>
-              <TableHead className="text-right">การดำเนินการ</TableHead>
+              <TableHead>ID</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8">
-                  <p className="text-muted-foreground">ไม่พบผู้ใช้</p>
+                <TableCell colSpan={7} className="text-center py-8">
+                  <p className="text-muted-foreground">No users found</p>
                 </TableCell>
               </TableRow>
             ) : (
               rows.map((user) => (
                 <TableRow key={user.id}>
+                  <TableCell className="font-mono text-xs">{user.id}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.name}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium">
-                        {user.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-xs text-muted-foreground">{user.id}</p>
-                      </div>
+                    <Badge className={roleColors[user.role]}>{user.role}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={statusColors[user.status]}>{user.status}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <p className="text-sm">{formatDate(user.createdAt, 'short')}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatRelativeTime(user.createdAt)}
+                      </p>
                     </div>
                   </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.phone || '-'}</TableCell>
-                  <TableCell>
-                    <Badge variant={roleColors[user.role]}>{roleLabels[user.role]}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={statusColors[user.status]}>{statusLabels[user.status]}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    {user.role === 'BUYER' ? (
-                      <div>
-                        <p className="text-sm">{user.bookings || 0} การจอง</p>
-                        <p className="text-xs text-muted-foreground">
-                          ฿{user.totalSpent?.toLocaleString() || 0}
-                        </p>
-                      </div>
-                    ) : user.role === 'VENDOR' ? (
-                      <div>
-                        <p className="text-sm">{user.bookings || 0} งาน</p>
-                        <p className="text-xs text-muted-foreground">
-                          รับจอง
-                        </p>
-                      </div>
-                    ) : (
-                      '-'
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {user.lastLogin ? (
-                      <div>
-                        <p className="text-sm">{formatDate(user.lastLogin, 'short')}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatRelativeTime(user.lastLogin)}
-                        </p>
-                      </div>
-                    ) : (
-                      '-'
-                    )}
-                  </TableCell>
-                  <TableCell>{formatDate(user.createdAt, 'short')}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
                       {user.status === 'ACTIVE' && (
                         <Button
-                          variant="ghost"
                           size="sm"
+                          variant="destructive"
                           onClick={() => {
                             setSelectedUser(user);
                             setShowSuspendDialog(true);
                           }}
-                          className="text-red-600"
                         >
-                          <Ban className="h-4 w-4" />
+                          <UserX className="h-4 w-4 mr-1" />
+                          Suspend
                         </Button>
                       )}
                       {user.status === 'SUSPENDED' && (
                         <Button
-                          variant="ghost"
                           size="sm"
-                          onClick={() => handleUnsuspend(user.id)}
-                          className="text-green-600"
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setShowUnsuspendDialog(true);
+                          }}
                         >
-                          <CheckCircle className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {user.status === 'PENDING' && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleActivate(user.id)}
-                          className="text-green-600"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                          อนุมัติ
+                          <UserCheck className="h-4 w-4 mr-1" />
+                          Unsuspend
                         </Button>
                       )}
                     </div>
@@ -382,30 +246,64 @@ export default function AdminUsersPage() {
       {showSuspendDialog && selectedUser && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="w-full max-w-md p-6">
-            <h3 className="text-lg font-semibold mb-4">ระงับการใช้งานผู้ใช้</h3>
+            <h3 className="text-lg font-semibold mb-4">Suspend User</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              คุณกำลังระงับการใช้งาน: <strong>{selectedUser.name}</strong>
+              You are suspending user: <strong>{selectedUser.name}</strong> ({selectedUser.email})
             </p>
             <div className="mb-4">
-              <label className="text-sm font-medium mb-2 block">เหตุผลในการระงับ</label>
-              <textarea
-                value={suspendReason}
-                onChange={(e) => setSuspendReason(e.target.value)}
-                placeholder="ระบุเหตุผลในการระงับการใช้งาน..."
+              <label className="text-sm font-medium mb-2 block">Reason for suspension</label>
+              <Textarea
+                value={actionReason}
+                onChange={(e) => setActionReason(e.target.value)}
+                placeholder="Provide a reason for suspending this user..."
                 rows={4}
-                className="w-full px-3 py-2 border rounded-md text-sm"
               />
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setShowSuspendDialog(false)}>
-                ยกเลิก
+                Cancel
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleSuspend}
-                disabled={!suspendReason.trim()}
+                disabled={!actionReason.trim()}
               >
-                ยืนยันการระงับ
+                <UserX className="h-4 w-4 mr-2" />
+                Suspend User
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Unsuspend Dialog */}
+      {showUnsuspendDialog && selectedUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md p-6">
+            <h3 className="text-lg font-semibold mb-4">Unsuspend User</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              You are unsuspending user: <strong>{selectedUser.name}</strong> ({selectedUser.email})
+            </p>
+            <div className="mb-4">
+              <label className="text-sm font-medium mb-2 block">Reason for unsuspension</label>
+              <Textarea
+                value={actionReason}
+                onChange={(e) => setActionReason(e.target.value)}
+                placeholder="Provide a reason for unsuspending this user..."
+                rows={4}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowUnsuspendDialog(false)}>
+                Cancel
+              </Button>
+              <Button
+                className="bg-green-600 hover:bg-green-700"
+                onClick={handleUnsuspend}
+                disabled={!actionReason.trim()}
+              >
+                <UserCheck className="h-4 w-4 mr-2" />
+                Unsuspend User
               </Button>
             </div>
           </Card>

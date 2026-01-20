@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Vendor } from '@/types';
 import apiClient from '@/lib/api-client';
+import { usePendingApprovals } from './use-admin-actions';
 
 const defaultVendors: Vendor[] = [];
 
@@ -39,5 +40,14 @@ export function useVendors(searchQuery = '') {
     vendors,
     loading,
     error,
+  };
+}
+
+export function useVendorActions() {
+  const { banVendor, unbanVendor } = usePendingApprovals();
+
+  return {
+    banVendor,
+    unbanVendor,
   };
 }
