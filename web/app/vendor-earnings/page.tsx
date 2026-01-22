@@ -9,18 +9,21 @@ import {
   IconInfoCircle,
   IconCurrencyBaht,
   IconChartBar,
-  IconCalendar
+  IconCalendar,
+  IconDownload
 } from '@tabler/icons-react';
 import { EarningsCalculator } from '@/components/vendor-earnings/EarningsCalculator';
 import { PayoutHistory } from '@/components/vendor-earnings/PayoutHistory';
+import { FinancialExport } from '@/components/vendor-earnings/FinancialExport';
 import type { CommissionTier } from '@/components/vendor-earnings/types';
 
 export default function VendorEarningsPage() {
-  const [activeTab, setActiveTab] = useState<'calculator' | 'history'>('calculator');
+  const [activeTab, setActiveTab] = useState<'calculator' | 'history' | 'export'>('calculator');
 
   const tabs = [
     { id: 'calculator' as const, label: 'Earnings Calculator', icon: IconCalculator },
     { id: 'history' as const, label: 'Payout History', icon: IconReceipt },
+    { id: 'export' as const, label: 'Financial Export', icon: IconDownload },
   ];
 
   return (
@@ -154,6 +157,7 @@ export default function VendorEarningsPage() {
         >
           {activeTab === 'calculator' && <EarningsCalculator />}
           {activeTab === 'history' && <PayoutHistory />}
+          {activeTab === 'export' && <FinancialExport />}
         </motion.div>
       </div>
     </div>

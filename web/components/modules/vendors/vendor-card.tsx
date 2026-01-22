@@ -3,12 +3,25 @@ import Link from 'next/link';
 import { GlassCard } from '@/components/ui/glass-card';
 import { formatCurrency, formatNumber } from '@/lib/utils';
 import type { VendorSummary } from '@/lib/api';
+import { AIInsightBadge, type AIMatchingFactors } from '@/components/vendors/AIInsightBadge';
 
 type VendorCardProps = {
   vendor: VendorSummary;
+  aiMatchingFactors?: AIMatchingFactors;
+  eventType?: string;
+  budget?: number;
+  preferredColors?: string[];
+  ritualType?: string;
 };
 
-export const VendorCard = ({ vendor }: VendorCardProps) => (
+export const VendorCard = ({
+  vendor,
+  aiMatchingFactors,
+  eventType,
+  budget,
+  preferredColors,
+  ritualType
+}: VendorCardProps) => (
   <GlassCard className="flex h-full flex-col overflow-hidden p-0">
     <div className="relative h-56 w-full overflow-hidden">
       <Image
@@ -29,6 +42,19 @@ export const VendorCard = ({ vendor }: VendorCardProps) => (
           {vendor.zone}
         </span>
       </div>
+      {/* AI Insight Badge */}
+      {aiMatchingFactors && (
+        <div className="absolute right-5 top-5">
+          <AIInsightBadge
+            matchingFactors={aiMatchingFactors}
+            vendorName={vendor.name}
+            eventType={eventType}
+            budget={budget}
+            preferredColors={preferredColors}
+            ritualType={ritualType}
+          />
+        </div>
+      )}
     </div>
     <div className="flex flex-1 flex-col gap-4 px-6 pb-6 pt-5 text-ivory">
       <div className="flex items-start justify-between gap-4">

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { IconTrendingUp, IconTrendingDown, IconInfo, IconFilter, IconX } from '@tabler/icons-react';
+import { IconTrendingUp, IconTrendingDown, IconInfoCircle, IconFilter, IconX } from '@tabler/icons-react';
 import { PriceStabilityChart } from '../../components/marketplace-trends/PriceStabilityChart';
 import { BudgetGauge } from '../../components/marketplace-trends/BudgetGauge';
 
@@ -153,7 +153,7 @@ export default function MarketplaceTrendsPage() {
           <div className="mt-8 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <IconInfo className="w-6 h-6 text-purple-600" />
+                <IconInfoCircle className="w-6 h-6 text-purple-600" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-purple-900 dark:text-purple-300">
@@ -356,7 +356,7 @@ export default function MarketplaceTrendsPage() {
                         : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600'
                     }`}>
                       <div className="flex items-start gap-3">
-                        <IconInfo className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+                        <IconInfoCircle className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
                         <div>
                           <p className="font-semibold text-gray-900 dark:text-white mb-1">
                             Market Benchmark

@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { IconZoomIn } from '@tabler/icons-react';
+import { MemoryHighlight } from './MemoryHighlight';
 import type { RitualPhase, MemoryPhoto } from './types';
 
 interface TimelineMasonryProps {

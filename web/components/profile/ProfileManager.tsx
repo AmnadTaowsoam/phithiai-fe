@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import type { AuthUser } from '@/lib/api/auth';
 import { updateMe, changePassword } from '@/lib/api/users';
 import { clearClientAuthTokens, getClientAccessToken } from '@/lib/auth';
+import { PersonalizationLevel, type PersonalizationLevel as PersonalizationLevelType } from '@/components/profile/PersonalizationLevel';
 
 const profileSchema = z.object({
   firstName: z.string().min(1, 'First name is required').optional(),
@@ -35,6 +36,43 @@ type ProfileManagerProps = {
 
 export const ProfileManager = ({ user }: ProfileManagerProps) => {
   const router = useRouter();
+
+  // Mock personalization data - would come from API
+  const personalizationData: PersonalizationLevelType = useMemo(() => {
+    const score = Math.min(100, Math.floor(
+      (user.firstName ? 20 : 0) +
+      (user.lastName ? 20 : 0) +
+      (user.phone ? 15 : 0) +
+      (user.avatar ? 15 : 0) +
+      30 // Base score for having account
+    ));
+
+    let level: PersonalizationLevelType['level'] = 'basic';
+    if (score >= 90) level = 'expert';
+    else if (score >= 75) level = 'high';
+    else if (score >= 60) level = 'moderate';
+
+    return {
+      level,
+      score,
+      factors: {
+        profileCompleteness: score,
+        preferenceHistory: Math.min(100, score + 10),
+        interactionCount: Math.min(100, score - 5),
+        feedbackProvided: Math.min(100, score - 10)
+      },
+      nextLevel: level !== 'expert' ? {
+        level: level === 'basic' ? 'Moderate' : level === 'moderate' ? 'High' : 'Expert',
+        threshold: level === 'basic' ? 60 : level === 'moderate' ? 75 : 90,
+        benefits: [
+          'More accurate vendor recommendations',
+          'Personalized event suggestions',
+          'Priority customer support',
+          'Exclusive vendor discounts'
+        ]
+      } : undefined
+    };
+  }, [user]);
 
   const [profileValues, setProfileValues] = useState({
     firstName: user.firstName ?? '',
@@ -138,13 +176,16 @@ export const ProfileManager = ({ user }: ProfileManagerProps) => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6 px-6 py-10">
+    <div className="mx-auto w-full max-w-6xl space-y-6 px-6 py-10">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold text-ivory">Your profile</h1>
-        <p className="text-ivory/60">Manage your account details and security settings.</p>
+        <p className="text-ivory/60">Manage your account details, security settings, and personalization preferences.</p>
       </div>
 
-      <Card className="border-ivory/15 bg-background/70 shadow-subtle">
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="border-ivory/15 bg-background/70 shadow-subtle">
         <CardHeader>
           <CardTitle>Profile details</CardTitle>
           <CardDescription>Keep your name and contact info up to date.</CardDescription>
@@ -277,6 +318,13 @@ export const ProfileManager = ({ user }: ProfileManagerProps) => {
           </form>
         </CardContent>
       </Card>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          <PersonalizationLevel personalization={personalizationData} />
+        </div>
+      </div>
     </div>
   );
 };

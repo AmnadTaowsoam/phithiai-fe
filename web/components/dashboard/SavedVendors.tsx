@@ -1,12 +1,12 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
-import { Heart, MapPin, Star, Calendar, DollarSign, X, Filter, Grid, List } from 'lucide-react';
-import { GlassCard } from '@/components/ui/glass-card';
-import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
+import { IconHeart, IconHeartBroken, IconMessage, IconLayoutGrid, IconList } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
-export type SavedVendor = {
+export interface SavedVendor {
   id: string;
   name: string;
   category: string;
@@ -15,463 +15,226 @@ export type SavedVendor = {
   rating: number;
   reviewCount: number;
   zone: string;
-  startingPrice?: number;
+  startingPrice: number;
   verified: boolean;
   tags: string[];
-  minAdvanceBooking?: number;
+  minAdvanceBooking: number;
   savedAt: string;
-};
+}
 
-type Props = {
+export interface SavedVendorsProps {
   vendors: SavedVendor[];
   onVendorClick?: (vendor: SavedVendor) => void;
   onUnsave?: (vendorId: string) => void;
   onContact?: (vendor: SavedVendor) => void;
-};
+}
 
-export const SavedVendors = ({ vendors, onVendorClick, onUnsave, onContact }: Props) => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterZone, setFilterZone] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+type ViewMode = 'grid' | 'list';
 
-  const categories = ['all', ...Array.from(new Set(vendors.map(v => v.category)))];
-  const zones = ['all', ...Array.from(new Set(vendors.map(v => v.zone)))];
+export function SavedVendors({
+  vendors,
+  onVendorClick,
+  onUnsave,
+  onContact,
+}: SavedVendorsProps) {
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [hoveredVendor, setHoveredVendor] = useState<string | null>(null);
 
-  const filteredVendors = vendors.filter(vendor => {
-    const matchesCategory = filterCategory === 'all' || vendor.category === filterCategory;
-    const matchesZone = filterZone === 'all' || vendor.zone === filterZone;
-    const matchesSearch = searchQuery === '' ||
-      vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vendor.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    return matchesCategory && matchesZone && matchesSearch;
-  });
-
-  const formatCurrency = (amount?: number) => {
-    if (!amount) return 'Contact for pricing';
-    return new Intl.NumberFormat('th-TH', {
-      style: 'currency',
-      currency: 'THB',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const daysAgo = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (daysAgo === 0) return 'Today';
-    if (daysAgo === 1) return 'Yesterday';
-    if (daysAgo < 7) return `${daysAgo} days ago`;
-    if (daysAgo < 30) return `${Math.floor(daysAgo / 7)} weeks ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  };
-
-  if (viewMode === 'grid') {
-    return (
-      <GlassCard className="p-6">
-        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-ivory">Saved Vendors</h2>
-            <Badge className="border-ivory/15 bg-ivory/5 text-ivory/80">
-              {vendors.length} saved
-            </Badge>
+  return (
+    <Card className="border-ivory/10 bg-background/60">
+      <CardContent className="p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-ivory">Saved Vendors</h3>
+            <p className="text-sm text-ivory/60">
+              {vendors.length} vendor{vendors.length !== 1 ? 's' : ''} saved
+            </p>
           </div>
-
-          <div className="flex flex-wrap gap-2">
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ivory/60" />
-              <input
-                type="text"
-                placeholder="Search vendors..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-ivory/15 bg-background/70 pl-9 pr-4 py-2 text-sm text-ivory placeholder:text-ivory/40 focus:border-brand-500/40 focus:outline-none"
-              />
-            </div>
-
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="rounded-lg border border-ivory/15 bg-background/70 px-4 py-2 text-sm text-ivory focus:border-brand-500/40 focus:outline-none"
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => setViewMode('grid')}
+              className={viewMode === 'grid' ? 'bg-ivory/10 text-ivory' : 'text-ivory/60'}
             >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Categories' : cat}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={filterZone}
-              onChange={(e) => setFilterZone(e.target.value)}
-              className="rounded-lg border border-ivory/15 bg-background/70 px-4 py-2 text-sm text-ivory focus:border-brand-500/40 focus:outline-none"
+              <IconLayoutGrid size={18} />
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setViewMode('list')}
+              className={viewMode === 'list' ? 'bg-ivory/10 text-ivory' : 'text-ivory/60'}
             >
-              {zones.map(zone => (
-                <option key={zone} value={zone}>
-                  {zone === 'all' ? 'All Zones' : zone}
-                </option>
-              ))}
-            </select>
-
-            <div className="flex rounded-lg border border-ivory/15 bg-background/70">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`rounded-l-lg px-3 py-2 transition-colors ${
-                  viewMode === 'grid'
-                    ? 'bg-brand-500/10 text-brand-200'
-                    : 'text-ivory/60 hover:text-ivory'
-                }`}
-              >
-                <Grid className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`rounded-r-lg px-3 py-2 transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-brand-500/10 text-brand-200'
-                    : 'text-ivory/60 hover:text-ivory'
-                }`}
-              >
-                <List className="h-4 w-4" />
-              </button>
-            </div>
+              <IconList size={18} />
+            </Button>
           </div>
         </div>
 
-        {filteredVendors.length === 0 ? (
-          <div className="py-12 text-center">
-            <Heart className="mx-auto mb-4 h-12 w-12 text-ivory/20" />
-            <p className="text-ivory/60">
-              {searchQuery || filterCategory !== 'all' || filterZone !== 'all'
-                ? 'No vendors match your filters'
-                : 'No saved vendors yet'}
-            </p>
+        {vendors.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <IconHeart size={48} className="mb-4 text-ivory/20" />
+            <p className="text-ivory/60">No saved vendors yet</p>
+            <p className="text-sm text-ivory/40">Start browsing and save your favorites</p>
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {vendors.map((vendor) => (
+              <motion.div
+                key={vendor.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -2 }}
+                onMouseEnter={() => setHoveredVendor(vendor.id)}
+                onMouseLeave={() => setHoveredVendor(null)}
+              >
+                <Card
+                  className="cursor-pointer border-ivory/10 bg-background/70 transition-colors hover:border-ivory/20"
+                  onClick={() => onVendorClick?.(vendor)}
+                >
+                  <CardContent className="p-4">
+                    <div className="mb-3 flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-ivory">{vendor.name}</h4>
+                        <p className="text-sm text-ivory/60">{vendor.category}</p>
+                      </div>
+                      {vendor.verified && (
+                        <span className="flex h-6 items-center rounded-full bg-brand-500/20 px-2 text-xs font-medium text-brand-200">
+                          Verified
+                        </span>
+                      )}
+                    </div>
+                    <div className="mb-3 flex items-center gap-4 text-sm text-ivory/60">
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium text-ivory">{vendor.rating.toFixed(1)}</span>
+                        <span>({vendor.reviewCount})</span>
+                      </div>
+                      <div>{vendor.zone}</div>
+                    </div>
+                    <div className="mb-3 flex flex-wrap gap-1">
+                      {vendor.tags.slice(0, 2).map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full bg-ivory/5 px-2 py-0.5 text-xs text-ivory/60"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {vendor.tags.length > 2 && (
+                        <span className="rounded-full bg-ivory/5 px-2 py-0.5 text-xs text-ivory/60">
+                          +{vendor.tags.length - 2}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mb-3 flex items-center justify-between text-sm">
+                      <div className="text-ivory">
+                        <span className="font-medium">
+                          {vendor.startingPrice.toLocaleString()} THB
+                        </span>
+                        <span className="text-ivory/60"> starting</span>
+                      </div>
+                      <div className="text-xs text-ivory/40">
+                        {vendor.minAdvanceBooking} days advance
+                      </div>
+                    </div>
+                    {hoveredVendor === vendor.id && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex gap-2"
+                      >
+                        <Button
+                          variant="outline"
+                          className="flex-1 border-ivory/15 bg-background/70 text-ivory hover:border-ivory/25"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onContact?.(vendor);
+                          }}
+                        >
+                          <IconMessage size={16} className="mr-1" />
+                          Contact
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="flex-1 border-red-500/20 bg-red-500/5 text-red-300 hover:border-red-500/30 hover:bg-red-500/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onUnsave?.(vendor.id);
+                          }}
+                        >
+                          <IconHeartBroken size={16} className="mr-1" />
+                          Unsave
+                        </Button>
+                      </motion.div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredVendors.map((vendor) => (
-              <div
+          <div className="space-y-3">
+            {vendors.map((vendor) => (
+              <motion.div
                 key={vendor.id}
-                onClick={() => onVendorClick?.(vendor)}
-                className="group relative overflow-hidden rounded-lg border border-ivory/10 bg-background/60 transition-all hover:border-ivory/20 hover:shadow-lg"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                whileHover={{ x: 2 }}
               >
-                {/* Cover Image */}
-                {vendor.coverImage && (
-                  <div className="relative h-32 overflow-hidden">
-                    <img
-                      src={vendor.coverImage}
-                      alt={vendor.name}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                  </div>
-                )}
-
-                {/* Unsave Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUnsave?.(vendor.id);
-                  }}
-                  className="absolute right-3 top-3 rounded-full border border-ivory/20 bg-background/90 p-2 text-ivory/60 transition-colors hover:bg-background hover:text-red-200"
+                <Card
+                  className="cursor-pointer border-ivory/10 bg-background/70 transition-colors hover:border-ivory/20"
+                  onClick={() => onVendorClick?.(vendor)}
                 >
-                  <X className="h-4 w-4" />
-                </button>
-
-                <div className="p-4">
-                  {/* Vendor Info */}
-                  <div className="flex items-start gap-3">
-                    {vendor.logo && (
-                      <img
-                        src={vendor.logo}
-                        alt={vendor.name}
-                        className="h-12 w-12 rounded-full border border-ivory/10 object-cover"
-                      />
-                    )}
-                    <div className="min-w-0 flex-1">
+                  <CardContent className="flex items-center gap-4 p-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-ivory/5 text-ivory/60">
+                      <IconHeart size={24} />
+                    </div>
+                    <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="truncate text-sm font-semibold text-ivory group-hover:text-brand-200">
-                          {vendor.name}
-                        </h3>
+                        <h4 className="font-semibold text-ivory">{vendor.name}</h4>
                         {vendor.verified && (
-                          <Badge className="border-emerald-500/30 bg-emerald-500/10 text-emerald-200 text-xs">
+                          <span className="rounded-full bg-brand-500/20 px-2 py-0.5 text-xs font-medium text-brand-200">
                             Verified
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="mt-1 flex items-center gap-3 text-xs text-ivory/60">
-                        <span className="flex items-center gap-1">
-                          <Star className="h-3 w-3 fill-current text-amber-400" />
-                          {vendor.rating.toFixed(1)}
-                        </span>
-                        <span>({vendor.reviewCount} reviews)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Details */}
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center gap-2 text-xs text-ivory/80">
-                      <MapPin className="h-3 w-3" />
-                      <span>{vendor.zone}</span>
-                      <Badge className="border-ivory/15 bg-ivory/5 text-ivory/80">
-                        {vendor.category}
-                      </Badge>
-                    </div>
-
-                    {vendor.startingPrice && (
-                      <div className="flex items-center gap-2 text-xs text-ivory/80">
-                        <DollarSign className="h-3 w-3" />
-                        <span>Starting from {formatCurrency(vendor.startingPrice)}</span>
-                      </div>
-                    )}
-
-                    {vendor.minAdvanceBooking && (
-                      <div className="flex items-center gap-2 text-xs text-ivory/80">
-                        <Calendar className="h-3 w-3" />
-                        <span>Book {vendor.minAdvanceBooking}+ days in advance</span>
-                      </div>
-                    )}
-
-                    {/* Tags */}
-                    {vendor.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {vendor.tags.slice(0, 3).map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded-full border border-ivory/15 bg-ivory/5 px-2 py-0.5 text-xs text-ivory/80"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                        {vendor.tags.length > 3 && (
-                          <span className="text-xs text-ivory/60">
-                            +{vendor.tags.length - 3} more
                           </span>
                         )}
                       </div>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="mt-4 flex gap-2">
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onContact?.(vendor);
-                      }}
-                      className="flex-1 rounded-lg border border-brand-500/40 bg-brand-500/10 px-3 py-2 text-sm font-medium text-brand-200 hover:bg-brand-500/15"
-                    >
-                      Contact
-                    </Button>
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onVendorClick?.(vendor);
-                      }}
-                      className="flex-1 rounded-lg border border-ivory/15 bg-background/70 px-3 py-2 text-sm font-medium text-ivory hover:border-ivory/25"
-                    >
-                      View Details
-                    </Button>
-                  </div>
-
-                  {/* Saved Date */}
-                  <div className="mt-3 text-center text-xs text-ivory/40">
-                    Saved {formatDate(vendor.savedAt)}
-                  </div>
-                </div>
-              </div>
+                      <p className="text-sm text-ivory/60">{vendor.category} â€¢ {vendor.zone}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium text-ivory">
+                        {vendor.startingPrice.toLocaleString()} THB
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-ivory/60">
+                        <span>{vendor.rating.toFixed(1)}</span>
+                        <span>({vendor.reviewCount})</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        className="text-ivory/60 hover:bg-ivory/5 hover:text-ivory"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onContact?.(vendor);
+                        }}
+                      >
+                        <IconMessage size={18} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="text-red-300 hover:bg-red-500/10 hover:text-red-200"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onUnsave?.(vendor.id);
+                        }}
+                      >
+                        <IconHeartBroken size={18} />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         )}
-      </GlassCard>
-    );
-  }
-
-  // List View
-  return (
-    <GlassCard className="p-6">
-      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-ivory">Saved Vendors</h2>
-          <Badge className="border-ivory/15 bg-ivory/5 text-ivory/80">
-            {vendors.length} saved
-          </Badge>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ivory/60" />
-            <input
-              type="text"
-              placeholder="Search vendors..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border border-ivory/15 bg-background/70 pl-9 pr-4 py-2 text-sm text-ivory placeholder:text-ivory/40 focus:border-brand-500/40 focus:outline-none"
-            />
-          </div>
-
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="rounded-lg border border-ivory/15 bg-background/70 px-4 py-2 text-sm text-ivory focus:border-brand-500/40 focus:outline-none"
-          >
-            {categories.map(cat => (
-              <option key={cat} value={cat}>
-                {cat === 'all' ? 'All Categories' : cat}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filterZone}
-            onChange={(e) => setFilterZone(e.target.value)}
-            className="rounded-lg border border-ivory/15 bg-background/70 px-4 py-2 text-sm text-ivory focus:border-brand-500/40 focus:outline-none"
-          >
-            {zones.map(zone => (
-              <option key={zone} value={zone}>
-                {zone === 'all' ? 'All Zones' : zone}
-              </option>
-            ))}
-          </select>
-
-          <div className="flex rounded-lg border border-ivory/15 bg-background/70">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`rounded-l-lg px-3 py-2 transition-colors ${
-                viewMode === 'grid'
-                  ? 'bg-brand-500/10 text-brand-200'
-                  : 'text-ivory/60 hover:text-ivory'
-              }`}
-            >
-              <Grid className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`rounded-r-lg px-3 py-2 transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-brand-500/10 text-brand-200'
-                  : 'text-ivory/60 hover:text-ivory'
-              }`}
-            >
-              <List className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {filteredVendors.length === 0 ? (
-        <div className="py-12 text-center">
-          <Heart className="mx-auto mb-4 h-12 w-12 text-ivory/20" />
-          <p className="text-ivory/60">
-            {searchQuery || filterCategory !== 'all' || filterZone !== 'all'
-              ? 'No vendors match your filters'
-              : 'No saved vendors yet'}
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {filteredVendors.map((vendor) => (
-            <div
-              key={vendor.id}
-              onClick={() => onVendorClick?.(vendor)}
-              className="flex items-center gap-4 rounded-lg border border-ivory/10 bg-background/60 p-4 transition-all hover:border-ivory/20 hover:shadow-md"
-            >
-              {/* Vendor Image */}
-              {vendor.logo && (
-                <img
-                  src={vendor.logo}
-                  alt={vendor.name}
-                  className="h-14 w-14 rounded-full border border-ivory/10 object-cover"
-                />
-              )}
-
-              {/* Vendor Info */}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="truncate text-sm font-semibold text-ivory">
-                    {vendor.name}
-                  </h3>
-                  {vendor.verified && (
-                    <Badge className="border-emerald-500/30 bg-emerald-500/10 text-emerald-200 text-xs">
-                      Verified
-                    </Badge>
-                  )}
-                </div>
-                <div className="mt-1 flex items-center gap-4 text-xs text-ivory/60">
-                  <span className="flex items-center gap-1">
-                    <Star className="h-3 w-3 fill-current text-amber-400" />
-                    {vendor.rating.toFixed(1)}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {vendor.zone}
-                  </span>
-                  <Badge className="border-ivory/15 bg-ivory/5 text-ivory/80">
-                    {vendor.category}
-                  </Badge>
-                  {vendor.startingPrice && (
-                    <span className="flex items-center gap-1">
-                      <DollarSign className="h-3 w-3" />
-                      {formatCurrency(vendor.startingPrice)}
-                    </span>
-                  )}
-                </div>
-                {/* Tags */}
-                {vendor.tags.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {vendor.tags.slice(0, 4).map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-ivory/15 bg-ivory/5 px-2 py-0.5 text-xs text-ivory/80"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                    {vendor.tags.length > 4 && (
-                      <span className="text-xs text-ivory/60">
-                        +{vendor.tags.length - 4} more
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUnsave?.(vendor.id);
-                  }}
-                  className="rounded-lg border border-ivory/15 bg-background/70 p-2 text-ivory/60 transition-colors hover:bg-background hover:text-red-200"
-                  title="Remove from saved"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onContact?.(vendor);
-                  }}
-                  className="rounded-lg border border-brand-500/40 bg-brand-500/10 px-4 py-2 text-sm font-medium text-brand-200 hover:bg-brand-500/15"
-                >
-                  Contact
-                </Button>
-              </div>
-
-              {/* Saved Date */}
-              <div className="text-xs text-ivory/40">
-                Saved {formatDate(vendor.savedAt)}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </GlassCard>
+      </CardContent>
+    </Card>
   );
-};
+}

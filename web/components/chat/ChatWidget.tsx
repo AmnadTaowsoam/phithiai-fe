@@ -6,15 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export const ChatWidget = () => {
-  const wsUrl = useMemo(() => process.env.NEXT_PUBLIC_PHITHIAI_WS_URL ?? process.env.NEXT_PUBLIC_phithiai_WS_URL, []);
-  const { connected, messages, send } = useWebSocket(wsUrl);
+  const wsUrl = useMemo(() => process.env.NEXT_PUBLIC_PHITHIAI_WS_URL ?? process.env.NEXT_PUBLIC_phithiai_WS_URL ?? '', []);
+  const { status, send } = useWebSocket({ url: wsUrl });
   const [text, setText] = useState('');
+  const [messages, setMessages] = useState<Array<{ type: string; payload: any }>>([]);
+
+  const isConnected = status === 'connected';
 
   return (
     <div className="rounded-3xl border border-ivory/10 bg-background/70 p-5">
       <div className="flex items-center justify-between">
         <div className="text-sm font-semibold text-ivory">Chat</div>
-        <div className="text-xs text-ivory/60">{connected ? 'Connected' : 'Offline'}</div>
+        <div className="text-xs text-ivory/60">{isConnected ? 'Connected' : 'Offline'}</div>
       </div>
       <div className="mt-4 h-40 overflow-auto rounded-2xl border border-ivory/10 bg-background/50 p-3 text-xs text-ivory/70">
         {messages.length ? (
@@ -32,10 +35,11 @@ export const ChatWidget = () => {
         <Button
           onClick={() => {
             if (!text.trim()) return;
-            send({ type: 'chat.message', payload: { text } });
+            setMessages(prev => [...prev, { type: 'message', payload: { text } }]);
+            send({ type: 'message', data: { text }, conversationId: 'default' });
             setText('');
           }}
-          disabled={!connected}
+          disabled={!isConnected}
         >
           Send
         </Button>

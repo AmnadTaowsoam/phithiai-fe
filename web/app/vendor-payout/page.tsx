@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { IconClock, IconCheck, IconAlertTriangle, IconX, IconDownload, IconRefresh } from '@tabler/icons-react';
 
 type PayoutStatus = 'PENDING' | 'PROCESSING' | 'PAID' | 'DISPUTED';
@@ -35,8 +35,7 @@ export default function VendorPayoutPage() {
   const [disputeReason, setDisputeReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Mock data - replace with API call
-  useState(() => {
+  useEffect(() => {
     setPayouts([
       {
         id: 'p1',
@@ -100,7 +99,7 @@ export default function VendorPayoutPage() {
   const totalPending = payouts.filter(p => p.status === 'PENDING').reduce((sum, p) => sum + p.amount, 0);
   const totalProcessing = payouts.filter(p => p.status === 'PROCESSING').reduce((sum, p) => sum + p.amount, 0);
   const totalPaid = payouts.filter(p => p.status === 'PAID' || p.status === 'DISPUTED').reduce((sum, p) => sum + p.amount, 0);
-  const totalDisputed = disputes.filter(d => d.status === 'resolved').reduce((sum, d) => sum + payouts.find(p => p.id === d.payoutId)?.amount || 0, 0);
+  const totalDisputed = disputes.filter(d => d.status === 'resolved').reduce((sum, d) => sum + (payouts.find(p => p.id === d.payoutId)?.amount || 0), 0);
 
   const getStatusColor = (status: PayoutStatus) => {
     switch (status) {
@@ -135,7 +134,6 @@ export default function VendorPayoutPage() {
   const handleDisputeSubmit = () => {
     if (!disputeReason.trim()) return;
     setIsSubmitting(true);
-    // Simulate API call
     setTimeout(() => {
       setDisputes([...disputes, {
         id: `d${disputes.length + 1}`,
@@ -152,11 +150,9 @@ export default function VendorPayoutPage() {
 
   const getExpectedArrivalText = (payout: Payout) => {
     if (!payout.expectedArrival) return 'Calculating...';
-    
     const now = new Date();
     const diff = payout.expectedArrival.getTime() - now.getTime();
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    
     if (days <= 0) return 'Arriving today';
     if (days === 1) return 'Arriving tomorrow';
     if (days <= 7) return `Arriving in ${days} days`;
@@ -165,7 +161,6 @@ export default function VendorPayoutPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
@@ -191,10 +186,8 @@ export default function VendorPayoutPage() {
         </div>
       </div>
 
-      {/* Summary Cards */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Pending */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -220,7 +213,6 @@ export default function VendorPayoutPage() {
             </div>
           </motion.div>
 
-          {/* Processing */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -247,7 +239,6 @@ export default function VendorPayoutPage() {
             </div>
           </motion.div>
 
-          {/* Paid */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -274,7 +265,6 @@ export default function VendorPayoutPage() {
             </div>
           </motion.div>
 
-          {/* Disputed */}
           {disputes.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -294,16 +284,14 @@ export default function VendorPayoutPage() {
                   </span>
                 </div>
               </div>
-            </div>
-            <div className="text-4xl font-bold text-red-600 dark:text-red-400">
-              {totalDisputed.toLocaleString('th-TH', { style: 'currency', currency: 'THB' })}
-            </div>
-          </motion.div>
+              <div className="text-4xl font-bold text-red-600 dark:text-red-400">
+                {totalDisputed.toLocaleString('th-TH', { style: 'currency', currency: 'THB' })}
+              </div>
+            </motion.div>
           )}
         </div>
       </div>
 
-      {/* Payout Ledger */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
           <div className="flex items-center justify-between mb-6">
@@ -364,22 +352,22 @@ export default function VendorPayoutPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(payout.status)}`}>
-                          {getStatusIcon(payout.status)}
-                          <span className="ml-2">{payout.status}</span>
-                        </div>
-                      </td>
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium">
+                        {getStatusIcon(payout.status)}
+                        <span className="ml-2">{payout.status}</span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {payout.createdAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })}
-                      </td>
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {payout.processedAt ? payout.processedAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '-'}
-                      </td>
+                    </td>
                     <td className="px-6 py-4">
-                        <span className="text-sm">
-                          {getExpectedArrivalText(payout)}
-                        </span>
-                      </td>
+                      <span className="text-sm">
+                        {getExpectedArrivalText(payout)}
+                      </span>
+                    </td>
                     <td className="px-6 py-4">
                       {payout.description && (
                         <span className="text-xs text-red-600 dark:text-red-400" title={payout.description}>
@@ -401,7 +389,7 @@ export default function VendorPayoutPage() {
                           onClick={() => {
                             const link = document.createElement('a');
                             link.href = `/vendor-payout/${payout.id}`;
-                            link.download = true;
+                            link.download = '';
                             link.click();
                           }}
                           className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium"
@@ -426,123 +414,123 @@ export default function VendorPayoutPage() {
         </div>
       </div>
 
-      {/* Payout Detail Modal */}
-      {selectedPayout && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={() => setSelectedPayout(null)}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        >
+      <AnimatePresence>
+        {selectedPayout && (
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedPayout(null)}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           >
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 rounded-t-2xl">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white mb-2">
-                  Payout Details
-                </h2>
-                <button
-                  onClick={() => setSelectedPayout(null)}
-                  className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
-                >
-                  <IconX className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-                </button>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 rounded-t-2xl">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-white mb-2">
+                    Payout Details
+                  </h2>
+                  <button
+                    onClick={() => setSelectedPayout(null)}
+                    className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
+                  >
+                    <IconX className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div className="p-6">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">🎊</span>
+              <div className="p-6">
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">🎊</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900 dark:text-white text-lg">
+                      {selectedPayout.vendorName}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      {selectedPayout.id}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex-1 text-right">
+                  <div className="text-4xl font-bold text-gray-900 dark:text-white">
+                    {selectedPayout.amount.toLocaleString('th-TH', { style: 'currency', currency: 'THB' })}
+                  </div>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full">
+                    {getStatusIcon(selectedPayout.status)}
+                    <span className="ml-2">{selectedPayout.status}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mt-6 p-6">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Status</p>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full">
+                    {getStatusIcon(selectedPayout.status)}
+                    <span className="ml-2">{selectedPayout.status}</span>
+                  </div>
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900 dark:text-white text-lg">
-                    {selectedPayout.vendorName}
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Processed Date</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {selectedPayout.processedAt ? selectedPayout.processedAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Processing...'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Expected Arrival</p>
+                  <div className="text-lg font-medium text-gray-900 dark:text-white">
+                    {getExpectedArrivalText(selectedPayout)}
                   </div>
-                  <div className="text-sm text-purple-100 dark:text-purple-300">
-                    {selectedPayout.id}
-                  </div>
                 </div>
               </div>
 
-              <div className="flex-1 text-right">
-                <div className="text-4xl font-bold text-gray-900 dark:text-white">
-                  {selectedPayout.amount.toLocaleString('th-TH', { style: 'currency', currency: 'THB' })}
+              {selectedPayout.description && (
+                <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                    <strong>Note:</strong> {selectedPayout.description}
+                  </p>
                 </div>
-                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${getStatusColor(selectedPayout.status)}`}>
-                  {getStatusIcon(selectedPayout.status)}
-                  <span className="ml-2">{selectedPayout.status}</span>
-                </div>
-              </div>
-            </div>
+              )}
 
-            <div className="grid grid-cols-2 gap-4 mt-6">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Status</p>
-                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${getStatusColor(selectedPayout.status)}`}>
-                  {getStatusIcon(selectedPayout.status)}
-                  <span className="ml-2">{selectedPayout.status}</span>
-                </div>
-              </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {selectedPayout.processedAt ? selectedPayout.processedAt.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Processing...'}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Expected Arrival</p>
-                <div className="text-lg font-medium text-gray-900 dark:text-white">
-                  {getExpectedArrivalText(selectedPayout)}
-                </div>
-              </div>
-            </div>
-
-            {selectedPayout.description && (
-              <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl">
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  <strong>Note:</strong> {selectedPayout.description}
-                </p>
-              </div>
-            )}
-
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={() => {
-                  const link = document.createElement('a');
-                  link.href = `/vendor-payout/${selectedPayout.id}`;
-                  link.download = true;
-                  link.click();
-                }}
-                className="w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
-              >
-                <IconDownload className="w-5 h-5" />
-                <span>Download Receipt</span>
-              </button>
-            </div>
-
-            {selectedPayout.status === 'PAID' && (
               <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <button
-                  onClick={() => setShowDisputeModal(true)}
-                  className="w-full py-3 px-4 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors"
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = `/vendor-payout/${selectedPayout.id}`;
+                    link.download = '';
+                    link.click();
+                  }}
+                  className="w-full py-3 px-4 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
                 >
-                  <IconAlertTriangle className="w-5 h-5" />
-                  <span>Raise Dispute</span>
+                  <IconDownload className="w-5 h-5" />
+                  Download Receipt
                 </button>
               </div>
-            )}
-          </div>
-        </motion.div>
-      </motion.div>
-      )}
 
-      {/* Dispute Modal */}
+              {selectedPayout.status === 'PAID' && (
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={() => setShowDisputeModal(true)}
+                    className="w-full py-3 px-4 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors"
+                  >
+                    <IconAlertTriangle className="w-5 h-5" />
+                    Raise Dispute
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {showDisputeModal && (
           <motion.div
@@ -574,14 +562,14 @@ export default function VendorPayoutPage() {
               </div>
 
               <div className="p-6">
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
                   Reason for Dispute
                 </label>
                 <textarea
                   value={disputeReason}
                   onChange={(e) => setDisputeReason(e.target.value)}
                   placeholder="Please explain why you're disputing this payout..."
-                  rows={4"
+                  rows={4}
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
@@ -612,7 +600,7 @@ export default function VendorPayoutPage() {
                   )}
                 </button>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,3 +1,10 @@
+export type PriceDataPoint = {
+  date: Date;
+  price: number;
+  predictedPrice: number;
+  confidence: number;
+};
+
 export type RitualPhase = {
   id: string;
   name: string;

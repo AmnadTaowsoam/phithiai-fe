@@ -9,6 +9,8 @@ export interface CurrencyRate {
   to: Currency;
   rate: number;
   lastUpdated: Date;
+  ttl?: number; // Time to live in minutes
+  source?: string;
 }
 
 export interface CurrencyInfo {
@@ -32,7 +34,7 @@ export const CURRENCIES: Record<Currency, CurrencyInfo> = {
   CAD: { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar', flag: '🇨🇦', locale: 'en-CA' }
 };
 
-// Mock exchange rates (base: THB)
+// Mock exchange rates (base: THB) - will be replaced with real API
 const MOCK_RATES: Record<Currency, number> = {
   THB: 1,
   USD: 0.028,
@@ -46,6 +48,10 @@ const MOCK_RATES: Record<Currency, number> = {
   CAD: 0.038
 };
 
+// Cache key for localStorage
+const FX_RATES_CACHE_KEY = 'phithiai-fx-rates';
+const FX_RATES_TIMESTAMP_KEY = 'phithiai-fx-rates-timestamp';
+
 interface CurrencyContextType {
   currency: Currency;
   setCurrency: (currency: Currency) => void;
@@ -53,12 +59,88 @@ interface CurrencyContextType {
   convertPrice: (price: number, fromCurrency?: Currency) => number;
   getExchangeRate: (from: Currency, to: Currency) => number;
   currencies: Currency[];
+  CURRENCIES: Record<Currency, CurrencyInfo>;
+  fxRates: Record<string, CurrencyRate>;
+  refreshFXRates: () => Promise<void>;
+  isRefreshingFX: boolean;
+  lastFXUpdate: Date | null;
+  isRateStale: boolean;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
+// Function to fetch real-time FX rates from API
+async function fetchRealTimeFXRates(baseCurrency: Currency = 'THB'): Promise<Record<string, CurrencyRate>> {
+  try {
+    // In production, replace this with actual API call
+    // const response = await fetch(`/api/fx-rates?base=${baseCurrency}`);
+    // const data = await response.json();
+
+    // For now, simulate API response with mock data
+    const rates: Record<string, CurrencyRate> = {};
+    const now = new Date();
+
+    Object.keys(CURRENCIES).forEach((targetCurrency) => {
+      if (targetCurrency !== baseCurrency) {
+        const key = `${baseCurrency}-${targetCurrency}`;
+        rates[key] = {
+          from: baseCurrency,
+          to: targetCurrency as Currency,
+          rate: MOCK_RATES[targetCurrency as Currency] || 1,
+          lastUpdated: now,
+          ttl: 60, // 1 hour TTL
+          source: 'Open Exchange Rates API',
+        };
+      }
+    });
+
+    // Cache the rates
+    localStorage.setItem(FX_RATES_CACHE_KEY, JSON.stringify(rates));
+    localStorage.setItem(FX_RATES_TIMESTAMP_KEY, now.toISOString());
+
+    return rates;
+  } catch (error) {
+    console.error('Failed to fetch FX rates:', error);
+    // Return cached rates if available
+    return getCachedFXRates();
+  }
+}
+
+// Function to get cached FX rates
+function getCachedFXRates(): Record<string, CurrencyRate> {
+  try {
+    const cached = localStorage.getItem(FX_RATES_CACHE_KEY);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+  } catch (error) {
+    console.error('Failed to parse cached FX rates:', error);
+  }
+  return {};
+}
+
+// Function to check if cached rates are stale
+function areRatesStale(): boolean {
+  try {
+    const timestamp = localStorage.getItem(FX_RATES_TIMESTAMP_KEY);
+    if (!timestamp) return true;
+
+    const cachedTime = new Date(timestamp);
+    const now = new Date();
+    const diffMinutes = (now.getTime() - cachedTime.getTime()) / 60000;
+
+    return diffMinutes > 60; // Stale if older than 1 hour
+  } catch {
+    return true;
+  }
+}
+
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [currency, setCurrencyState] = useState<Currency>('THB');
+  const [fxRates, setFxRates] = useState<Record<string, CurrencyRate>>({});
+  const [isRefreshingFX, setIsRefreshingFX] = useState(false);
+  const [lastFXUpdate, setLastFXUpdate] = useState<Date | null>(null);
+  const [isRateStale, setIsRateStale] = useState(true);
 
   // Load saved currency from localStorage
   useEffect(() => {
@@ -66,6 +148,20 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     if (saved && CURRENCIES[saved]) {
       setCurrencyState(saved);
     }
+
+    // Load cached FX rates
+    const cachedRates = getCachedFXRates();
+    if (Object.keys(cachedRates).length > 0) {
+      setFxRates(cachedRates);
+      const timestamp = localStorage.getItem(FX_RATES_TIMESTAMP_KEY);
+      if (timestamp) {
+        setLastFXUpdate(new Date(timestamp));
+        setIsRateStale(areRatesStale());
+      }
+    }
+
+    // Initial fetch of real-time rates
+    refreshFXRates();
   }, []);
 
   // Save currency to localStorage when changed
@@ -74,8 +170,39 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('phithiai-currency', newCurrency);
   };
 
+  // Refresh FX rates from API
+  const refreshFXRates = async () => {
+    setIsRefreshingFX(true);
+    try {
+      const rates = await fetchRealTimeFXRates();
+      setFxRates(rates);
+      setLastFXUpdate(new Date());
+      setIsRateStale(false);
+    } catch (error) {
+      console.error('Failed to refresh FX rates:', error);
+    } finally {
+      setIsRefreshingFX(false);
+    }
+  };
+
+  // Auto-refresh FX rates every hour
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshFXRates();
+    }, 3600000); // 1 hour
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Get exchange rate between two currencies
   const getExchangeRate = (from: Currency, to: Currency): number => {
+    // First check real-time rates
+    const key = `${from}-${to}`;
+    if (fxRates[key] && !isRateStale) {
+      return fxRates[key].rate;
+    }
+
+    // Fall back to mock rates
     const fromRate = MOCK_RATES[from];
     const toRate = MOCK_RATES[to];
     return toRate / fromRate;
@@ -109,7 +236,13 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         formatPrice,
         convertPrice,
         getExchangeRate,
-        currencies: Object.keys(CURRENCIES) as Currency[]
+        currencies: Object.keys(CURRENCIES) as Currency[],
+        CURRENCIES,
+        fxRates,
+        refreshFXRates,
+        isRefreshingFX,
+        lastFXUpdate,
+        isRateStale
       }}
     >
       {children}

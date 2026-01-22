@@ -279,9 +279,9 @@ export default async function DashboardPage() {
           {/* Saved Vendors */}
           <SavedVendors
             vendors={mockSavedVendors}
-            onVendorClick={(vendor) => console.log('Vendor clicked:', vendor)}
-            onUnsave={(vendorId) => console.log('Unsave vendor:', vendorId)}
-            onContact={(vendor) => console.log('Contact vendor:', vendor)}
+            onVendorClick={(vendor: any) => console.log('Vendor clicked:', vendor)}
+            onUnsave={(vendorId: any) => console.log('Unsave vendor:', vendorId)}
+            onContact={(vendor: any) => console.log('Contact vendor:', vendor)}
           />
         </div>
       </div>

@@ -1,12 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 
 export const NotificationPanel = () => {
-  const wsUrl = useMemo(() => process.env.NEXT_PUBLIC_PHITHIAI_WS_URL ?? process.env.NEXT_PUBLIC_phithiai_WS_URL, []);
-  const { messages } = useWebSocket(wsUrl);
-  const notifications = messages.filter((m) => m.type.startsWith('notification.'));
+  const wsUrl = process.env.NEXT_PUBLIC_PHITHIAI_WS_URL ?? process.env.NEXT_PUBLIC_phithiai_WS_URL ?? 'ws://localhost:3001';
+  const { status } = useWebSocket({ url: wsUrl });
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   return (
     <div className="rounded-3xl border border-ivory/10 bg-background/70 p-5">

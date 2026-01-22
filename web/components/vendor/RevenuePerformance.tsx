@@ -21,6 +21,7 @@ export type BookingStats = {
   completed: number;
   cancelled: number;
   conversionRate: number;
+  averagePerBooking: number;
 };
 
 export type PerformanceMetrics = {

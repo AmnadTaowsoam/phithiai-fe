@@ -7,12 +7,13 @@ import type { RitualPhase, MemoryPhoto } from './types';
 
 interface MemoryFiltersProps {
   phases: RitualPhase[];
+  photos: MemoryPhoto[];
   selectedPhase: string | null;
   onSelectPhase: (phaseId: string | null) => void;
   onClose: () => void;
 }
 
-export function MemoryFilters({ phases, selectedPhase, onSelectPhase, onClose }: MemoryFiltersProps) {
+export function MemoryFilters({ phases, photos, selectedPhase, onSelectPhase, onClose }: MemoryFiltersProps) {
   return (
     <AnimatePresence>
       <motion.div
@@ -73,7 +74,7 @@ export function MemoryFilters({ phases, selectedPhase, onSelectPhase, onClose }:
             {/* Phase Filters */}
             <div className="space-y-3 mt-4">
               {phases.map((phase) => {
-                const phasePhotos = phases.filter(p => p.ritualPhaseId === phase.id).length;
+                const phasePhotos = photos.filter(p => p.ritualPhaseId === phase.id).length;
                 const isSelected = selectedPhase === phase.id;
 
                 return (

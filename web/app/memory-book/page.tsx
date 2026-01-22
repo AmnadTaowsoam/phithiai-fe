@@ -239,6 +239,7 @@ export default function MemoryBookPage() {
           {showFilters && (
             <MemoryFilters
               phases={memoryBook.ritualPhases}
+              photos={memoryBook.photos}
               selectedPhase={selectedPhase}
               onSelectPhase={setSelectedPhase}
               onClose={() => setShowFilters(false)}
@@ -297,6 +298,7 @@ export default function MemoryBookPage() {
             })}
           </div>
         )}
+      </div>
 
       {/* Social Export Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -382,7 +384,7 @@ export default function MemoryBookPage() {
                     </button>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
           </motion.div>
         )}

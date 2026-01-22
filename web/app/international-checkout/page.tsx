@@ -15,6 +15,7 @@ import {
   IconTruck
 } from '@tabler/icons-react';
 import { useCurrency, CURRENCIES } from '../../contexts/CurrencyContext';
+import { CurrencyProvider } from '../../contexts/CurrencyContext';
 
 export type Country = {
   code: string;
@@ -127,7 +128,7 @@ const ADDRESS_FIELDS: Record<Country['addressFormat'], AddressField[]> = {
   ]
 };
 
-export default function InternationalCheckoutPage() {
+function InternationalCheckoutContent() {
   const { currency, setCurrency, formatPrice, convertPrice } = useCurrency();
   const [step, setStep] = useState<'location' | 'details' | 'payment' | 'review'>('location');
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
@@ -190,7 +191,7 @@ export default function InternationalCheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -668,5 +669,13 @@ export default function InternationalCheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function InternationalCheckoutPage() {
+  return (
+    <CurrencyProvider>
+      <InternationalCheckoutContent />
+    </CurrencyProvider>
   );
 }

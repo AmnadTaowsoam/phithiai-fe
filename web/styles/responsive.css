@@ -15,3 +15,249 @@
   }
 }
 
+/* RTL Support */
+[dir='rtl'] {
+  text-align: right;
+}
+
+[dir='rtl'] .text-left {
+  text-align: right;
+}
+
+[dir='rtl'] .text-right {
+  text-align: left;
+}
+
+[dir='rtl'] .text-center {
+  text-align: center;
+}
+
+[dir='rtl'] .flex {
+  flex-direction: row-reverse;
+}
+
+[dir='rtl'] .flex-row {
+  flex-direction: row-reverse;
+}
+
+[dir='rtl'] .gap-x {
+  flex-direction: row-reverse;
+}
+
+[dir='rtl'] .space-x {
+  flex-direction: row-reverse;
+}
+
+[dir='rtl'] .space-x-reverse {
+  flex-direction: row;
+}
+
+[dir='rtl'] .ml-auto {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+[dir='rtl'] .mr-auto {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+[dir='rtl'] .ml-4 {
+  margin-right: 1rem;
+  margin-left: 0;
+}
+
+[dir='rtl'] .mr-4 {
+  margin-left: 1rem;
+  margin-right: 0;
+}
+
+[dir='rtl'] .pl-4 {
+  padding-right: 1rem;
+  padding-left: 0;
+}
+
+[dir='rtl'] .pr-4 {
+  padding-left: 1rem;
+  padding-right: 0;
+}
+
+/* LCP Optimization for international landing pages */
+.landing-hero {
+  content-visibility: auto;
+  contain: layout style paint;
+}
+
+.landing-hero img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  aspect-ratio: 16/9;
+  background-color: #f3f4f6;
+}
+
+.landing-hero [loading] img {
+  background-color: #e5e7eb;
+}
+
+@media (min-width: 768px) {
+  .landing-hero img {
+    aspect-ratio: 21/9;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-hero img {
+    aspect-ratio: 16/9;
+  }
+}
+
+/* Phase 12: Mobile-First Financial Charts & Tables Optimization */
+
+/* Financial Tables - Mobile Responsive */
+@media (max-width: 768px) {
+  /* Stack table rows on mobile */
+  .financial-table {
+    display: block;
+  }
+
+  .financial-table thead {
+    display: none;
+  }
+
+  .financial-table tbody,
+  .financial-table tr,
+  .financial-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .financial-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    background: white;
+  }
+
+  .financial-table td {
+    text-align: right;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    padding-left: 50%;
+  }
+
+  .financial-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 50%;
+    padding-left: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+    text-align: left;
+  }
+
+  /* FX Margin Table Mobile */
+  .fx-margin-table {
+    font-size: 0.75rem;
+  }
+
+  .fx-margin-table th,
+  .fx-margin-table td {
+    padding: 0.5rem;
+  }
+
+  .fx-margin-table td {
+    text-align: right;
+  }
+}
+
+/* Financial Charts - Mobile Responsive */
+@media (max-width: 640px) {
+  /* Revenue vs Payout Chart */
+  .revenue-chart {
+    min-height: 200px;
+  }
+
+  .revenue-chart .chart-bar {
+    min-width: 40px;
+  }
+
+  .revenue-chart .chart-label {
+    font-size: 0.7rem;
+  }
+
+  /* Anomaly Detection */
+  .anomaly-card {
+    padding: 0.75rem;
+  }
+
+  .anomaly-card .anomaly-description {
+    font-size: 0.8rem;
+  }
+
+  /* Financial Stats Cards */
+  .financial-stat-card {
+    padding: 0.75rem;
+  }
+
+  .financial-stat-card .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .financial-stat-card .stat-label {
+    font-size: 0.75rem;
+  }
+}
+
+/* Touch-Friendly Targets */
+@media (hover: none) and (pointer: coarse) {
+  .chart-bar,
+  .anomaly-card,
+  .financial-table tr {
+    min-height: 44px;
+  }
+
+  .chart-bar:hover,
+  .anomaly-card:hover {
+    transform: none;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .chart-bar,
+  .anomaly-card,
+  .financial-table tr {
+    border-width: 2px;
+  }
+
+  .chart-bar:hover {
+    opacity: 0.9;
+  }
+}
+
+/* Print Optimization for Financial Reports */
+@media print {
+  .financial-table,
+  .revenue-chart,
+  .anomaly-card {
+    page-break-inside: avoid;
+  }
+
+  .financial-table tr {
+    page-break-inside: avoid;
+  }
+}
+
+/* Performance Optimization */
+@media (prefers-reduced-motion: reduce) {
+  .chart-bar,
+  .anomaly-card,
+  .financial-table tr {
+    transition: none;
+  }
+}
+
