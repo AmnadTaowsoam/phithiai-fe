@@ -7,6 +7,8 @@ import { BudgetTracker } from '@/components/dashboard/BudgetTracker';
 import { SavedVendors } from '@/components/dashboard/SavedVendors';
 import { getServerAccessToken } from '@/lib/auth/server';
 import { listMyBookings, getBookingStatistics } from '@/lib/api/bookings';
+import { PlanningAPI } from '@/lib/api/planning-api';
+import { SavedVendorsAPI } from '@/lib/api/saved-vendors';
 
 export default async function DashboardPage() {
   const token = getServerAccessToken();
@@ -23,189 +25,150 @@ export default async function DashboardPage() {
   const upcoming = bookings.filter((b) => b.status && String(b.status).toLowerCase().includes('upcoming')).length;
   const confirmed = bookings.filter((b) => b.status && String(b.status).toLowerCase().includes('confirmed')).length;
 
-  // Mock data for planning timeline (would come from planning API)
-  const mockTimelineTasks = [
-    {
-      id: '1',
-      name: 'Select venue',
-      category: 'Venue',
-      status: 'completed' as const,
-      deadline: '2026-01-15',
-      priority: 'high' as const,
-      assignee: 'Bride',
-    },
-    {
-      id: '2',
-      name: 'Book photographer',
-      category: 'Photography',
-      status: 'in_progress' as const,
-      deadline: '2026-01-25',
-      priority: 'high' as const,
-      assignee: 'Groom',
-    },
-    {
-      id: '3',
-      name: 'Finalize catering menu',
-      category: 'Catering',
-      status: 'pending' as const,
-      deadline: '2026-02-01',
-      priority: 'medium' as const,
-      assignee: 'Bride',
-    },
-    {
-      id: '4',
-      name: 'Order invitations',
-      category: 'Invitations',
-      status: 'pending' as const,
-      deadline: '2026-02-15',
-      priority: 'medium' as const,
-      assignee: 'Groom',
-    },
-    {
-      id: '5',
-      name: 'Finalize decorations',
-      category: 'Decorations',
-      status: 'pending' as const,
-      deadline: '2026-02-20',
-      priority: 'low' as const,
-      assignee: 'Bride',
-    },
-  ];
+  // Fetch planning timeline from API
+  let timelineTasks: Array<{
+    id: string;
+    name: string;
+    category: string;
+    status: 'pending' | 'in_progress' | 'completed' | 'overdue';
+    deadline: string;
+    priority: 'low' | 'medium' | 'high';
+    assignee: string;
+  }> = [];
 
-  // Mock data for budget tracker (would come from planning API)
-  const mockBudgetData = {
+  try {
+    const checklistData = await PlanningAPI.generateChecklist({
+      eventType: 'wedding',
+      eventDate: new Date().toISOString(),
+      guestCount: 100,
+      budget: 500000,
+    });
+    // Transform checklist data to timeline tasks
+    if (checklistData && checklistData.checklist) {
+      let taskId = 1;
+      Object.entries(checklistData.checklist).forEach(([category, tasks]) => {
+        tasks.forEach((task: any) => {
+          timelineTasks.push({
+            id: String(taskId++),
+            name: task.task,
+            category: category,
+            status: task.completed ? 'completed' : 'pending',
+            deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // Default 30 days
+            priority: 'medium',
+            assignee: task.owner || 'Unassigned',
+          });
+        });
+      });
+    }
+  } catch (error) {
+    console.error('Failed to fetch planning timeline:', error);
+    // Fallback to empty array
+  }
+
+  // Fetch budget data from API
+  let budgetData = {
     totalBudget: 500000,
-    totalSpent: 285000,
-    remaining: 215000,
+    totalSpent: 0,
+    remaining: 500000,
     currency: 'THB',
-    categories: [
-      {
-        id: '1',
-        name: 'Venue',
-        budgeted: 150000,
-        spent: 150000,
-        color: '#3b82f6',
-      },
-      {
-        id: '2',
-        name: 'Catering',
-        budgeted: 100000,
-        spent: 80000,
-        color: '#8b5cf6',
-      },
-      {
-        id: '3',
-        name: 'Photography',
-        budgeted: 80000,
-        spent: 30000,
-        color: '#10b981',
-      },
-      {
-        id: '4',
-        name: 'Decorations',
-        budgeted: 70000,
-        spent: 15000,
-        color: '#f59e0b',
-      },
-      {
-        id: '5',
-        name: 'Entertainment',
-        budgeted: 50000,
-        spent: 10000,
-        color: '#ef4444',
-      },
-      {
-        id: '6',
-        name: 'Other',
-        budgeted: 50000,
-        spent: 0,
-        color: '#06b6d4',
-      },
-    ],
-    items: [
-      {
-        id: '1',
-        name: 'Venue Deposit',
-        category: 'Venue',
-        budgeted: 75000,
-        spent: 75000,
-        status: 'on_track' as const,
-      },
-      {
-        id: '2',
-        name: 'Catering Deposit',
-        category: 'Catering',
-        budgeted: 50000,
-        spent: 40000,
-        status: 'on_track' as const,
-      },
-      {
-        id: '3',
-        name: 'Photographer Deposit',
-        category: 'Photography',
-        budgeted: 30000,
-        spent: 30000,
-        status: 'on_track' as const,
-      },
-      {
-        id: '4',
-        name: 'Decorations Deposit',
-        category: 'Decorations',
-        budgeted: 20000,
-        spent: 15000,
-        status: 'under' as const,
-      },
-    ],
+    categories: [] as Array<{
+      id: string;
+      name: string;
+      budgeted: number;
+      spent: number;
+      color: string;
+    }>,
+    items: [] as Array<{
+      id: string;
+      name: string;
+      category: string;
+      budgeted: number;
+      spent: number;
+      status: 'under' | 'on_track' | 'over';
+    }>,
   };
 
-  // Mock data for saved vendors (would come from user API)
-  const mockSavedVendors = [
-    {
-      id: '1',
-      name: 'Thai Wedding Photography',
-      category: 'Photography',
-      logo: undefined,
-      coverImage: undefined,
-      rating: 4.8,
-      reviewCount: 124,
-      zone: 'Bangkok',
-      startingPrice: 30000,
-      verified: true,
-      tags: ['Wedding', 'Photography', 'Professional'],
-      minAdvanceBooking: 14,
-      savedAt: '2026-01-10T10:00:00Z',
-    },
-    {
-      id: '2',
-      name: 'Royal Thai Catering',
-      category: 'Catering',
-      logo: undefined,
-      coverImage: undefined,
-      rating: 4.5,
-      reviewCount: 89,
-      zone: 'Chiang Mai',
-      startingPrice: 500,
-      verified: true,
-      tags: ['Catering', 'Thai Cuisine', 'Buffet'],
-      minAdvanceBooking: 7,
-      savedAt: '2026-01-08T14:30:00Z',
-    },
-    {
-      id: '3',
-      name: 'Elegant Decor',
-      category: 'Decorations',
-      logo: undefined,
-      coverImage: undefined,
-      rating: 4.7,
-      reviewCount: 56,
-      zone: 'Phuket',
-      startingPrice: 20000,
-      verified: false,
-      tags: ['Decorations', 'Flowers', 'Setup'],
-      minAdvanceBooking: 21,
-      savedAt: '2026-01-05T09:15:00Z',
-    },
-  ];
+  try {
+    const budgetEstimate = await PlanningAPI.calculateBudget({
+      eventType: 'wedding',
+      guestCount: 100,
+      region: 'central',
+      budget: 500000,
+    });
+    if (budgetEstimate) {
+      budgetData.totalBudget = budgetEstimate.total.median;
+      budgetData.categories = [
+        {
+          id: '1',
+          name: 'Venue',
+          budgeted: budgetEstimate.breakdown.venue.median,
+          spent: 0,
+          color: '#3b82f6',
+        },
+        {
+          id: '2',
+          name: 'Catering',
+          budgeted: budgetEstimate.breakdown.catering.median,
+          spent: 0,
+          color: '#8b5cf6',
+        },
+        {
+          id: '3',
+          name: 'Photography',
+          budgeted: budgetEstimate.breakdown.photography.median,
+          spent: 0,
+          color: '#10b981',
+        },
+        {
+          id: '4',
+          name: 'Decorations',
+          budgeted: budgetEstimate.breakdown.decoration.median,
+          spent: 0,
+          color: '#f59e0b',
+        },
+        {
+          id: '5',
+          name: 'Entertainment',
+          budgeted: budgetEstimate.breakdown.entertainment.median,
+          spent: 0,
+          color: '#ef4444',
+        },
+        {
+          id: '6',
+          name: 'Other',
+          budgeted: budgetEstimate.breakdown.others.median,
+          spent: 0,
+          color: '#06b6d4',
+        },
+      ];
+      budgetData.remaining = budgetData.totalBudget;
+    }
+  } catch (error) {
+    console.error('Failed to fetch budget data:', error);
+  }
+
+  // Fetch saved vendors from API
+  let savedVendors: Array<{
+    id: string;
+    name: string;
+    category: string;
+    logo?: string;
+    coverImage?: string;
+    rating: number;
+    reviewCount: number;
+    zone: string;
+    startingPrice: number;
+    verified: boolean;
+    tags: string[];
+    minAdvanceBooking: number;
+    savedAt: string;
+  }> = [];
+
+  try {
+    savedVendors = await SavedVendorsAPI.getMySavedVendors(token);
+  } catch (error) {
+    console.error('Failed to fetch saved vendors:', error);
+  }
 
   // Transform bookings to match BookingStatusOverview type
   const transformedBookings = bookings.map((b) => ({
@@ -245,7 +208,7 @@ export default async function DashboardPage() {
         <StatCard label="Bookings" value={String(totalBookings)} hint="Total bookings in your account" />
         <StatCard label="Upcoming" value={String(upcoming)} hint="Bookings marked upcoming" />
         <StatCard label="Confirmed" value={String(confirmed)} hint="Bookings confirmed by vendors" />
-        <StatCard label="Tasks" value={String(mockTimelineTasks.length)} hint="Planning tasks to complete" />
+        <StatCard label="Tasks" value={String(timelineTasks.length)} hint="Planning tasks to complete" />
       </div>
 
       {/* Main Dashboard Grid */}
@@ -254,7 +217,7 @@ export default async function DashboardPage() {
         <div className="space-y-6">
           {/* Planning Timeline */}
           <PlanningTimeline
-            tasks={mockTimelineTasks}
+            tasks={timelineTasks}
             view="list"
             onTaskClick={(task) => console.log('Task clicked:', task)}
             onTaskStatusChange={(taskId, status) => console.log('Task status changed:', taskId, status)}
@@ -262,7 +225,7 @@ export default async function DashboardPage() {
 
           {/* Budget Tracker */}
           <BudgetTracker
-            data={mockBudgetData}
+            data={budgetData}
             onItemEdit={(itemId) => console.log('Edit budget item:', itemId)}
           />
         </div>
@@ -278,7 +241,7 @@ export default async function DashboardPage() {
 
           {/* Saved Vendors */}
           <SavedVendors
-            vendors={mockSavedVendors}
+            vendors={savedVendors}
             onVendorClick={(vendor: any) => console.log('Vendor clicked:', vendor)}
             onUnsave={(vendorId: any) => console.log('Unsave vendor:', vendorId)}
             onContact={(vendor: any) => console.log('Contact vendor:', vendor)}

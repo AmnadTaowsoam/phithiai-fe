@@ -1,85 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChatInterface, Conversation } from '@/components/chat/ChatInterface';
 import { GlassCard } from '@/components/ui/glass-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Plus, Filter, MessageCircle, Phone, Video } from 'lucide-react';
+import { InquiryAPI, type Conversation as APIConversation } from '@/lib/api/inquiry';
 
 export default function ChatPage() {
-  const [selectedConversation, setSelectedConversation] = useState<string | null>('1');
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [conversations, setConversations] = useState<APIConversation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [wsUrl, setWsUrl] = useState<string>('ws://localhost:3001/ws');
 
-  // Mock conversations data
-  const conversations: Conversation[] = [
-    {
-      id: '1',
-      participantId: 'vendor-1',
-      participantName: 'Photographer Pro',
-      participantAvatar: 'VP',
-      lastMessage: 'Thank you for your inquiry! I have availability on your requested date.',
-      lastMessageTime: '2 hours ago',
-      unreadCount: 2,
-      isOnline: true,
-      isTyping: false,
-      vendorName: 'Photographer Pro',
-      eventName: 'Wedding Photography',
-    },
-    {
-      id: '2',
-      participantId: 'vendor-2',
-      participantName: 'Floral Dreams',
-      participantAvatar: 'FD',
-      lastMessage: 'Here are the flower arrangements we discussed.',
-      lastMessageTime: '5 hours ago',
-      unreadCount: 0,
-      isOnline: false,
-      isTyping: false,
-      vendorName: 'Floral Dreams',
-      eventName: 'Wedding Flowers',
-    },
-    {
-      id: '3',
-      participantId: 'vendor-3',
-      participantName: 'Thai Catering Co.',
-      participantAvatar: 'TC',
-      lastMessage: 'The menu has been finalized. Please review the attached document.',
-      lastMessageTime: 'Yesterday',
-      unreadCount: 1,
-      isOnline: true,
-      isTyping: false,
-      vendorName: 'Thai Catering Co.',
-      eventName: 'Wedding Reception',
-    },
-    {
-      id: '4',
-      participantId: 'vendor-4',
-      participantName: 'Traditional Music Group',
-      participantAvatar: 'TM',
-      lastMessage: 'We can provide the traditional Thai music ensemble for your ceremony.',
-      lastMessageTime: '2 days ago',
-      unreadCount: 0,
-      isOnline: false,
-      isTyping: false,
-      vendorName: 'Traditional Music Group',
-      eventName: 'Wedding Ceremony',
-    },
-    {
-      id: '5',
-      participantId: 'vendor-5',
-      participantName: 'Makeup Artist Studio',
-      participantAvatar: 'MA',
-      lastMessage: 'Trial session scheduled for next Saturday.',
-      lastMessageTime: '3 days ago',
-      unreadCount: 0,
-      isOnline: true,
-      isTyping: false,
-      vendorName: 'Makeup Artist Studio',
-      eventName: 'Bridal Makeup',
-    },
-  ];
+  // Load conversations from API
+  useEffect(() => {
+    const loadConversations = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          const data = await InquiryAPI.getConversations(token);
+          setConversations(data as APIConversation[]);
+          // Set WebSocket URL with token
+          setWsUrl(InquiryAPI.getWebSocketUrl(token));
+        }
+      } catch (error) {
+        console.error('Failed to load conversations:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadConversations();
+  }, []);
 
   const filteredConversations = conversations.filter((conv) =>
     conv.participantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -93,6 +49,11 @@ export default function ChatPage() {
 
   const handleCallClick = (type: 'voice' | 'video') => {
     console.log(`Starting ${type} call with ${selectedConversationData?.participantName}`);
+  };
+
+  const handleNewMessage = () => {
+    console.log('Create new message');
+    // TODO: Implement new message creation
   };
 
   return (
@@ -123,8 +84,8 @@ export default function ChatPage() {
                 Filter
               </Button>
 
-              <Button>
-                <Plus className="mr-2 h-4" />
+              <Button onClick={handleNewMessage}>
+                <Plus className="mr-2 h-4 w-4" />
                 New Message
               </Button>
             </div>
@@ -143,69 +104,78 @@ export default function ChatPage() {
                 <p className="text-sm text-ivory/60">{conversations.length} active</p>
               </div>
 
-              <div className="overflow-y-auto">
-                {filteredConversations.map((conv) => (
-                  <div
-                    key={conv.id}
-                    onClick={() => setSelectedConversation(conv.id)}
-                    className={`cursor-pointer border-b border-ivory/5 p-4 transition-colors hover:bg-ivory/5 ${
-                      selectedConversation === conv.id ? 'bg-brand-500/10' : ''
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="relative">
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-brand-500 to-purple-500 flex items-center justify-center text-white font-semibold">
-                          {conv.participantAvatar}
-                        </div>
-                        {conv.isOnline && (
-                          <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-900 bg-emerald-500" />
-                        )}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold text-ivory truncate">
-                            {conv.participantName}
-                          </h3>
-                          <span className="text-xs text-ivory/60 whitespace-nowrap">
-                            {conv.lastMessageTime}
-                          </span>
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500" />
+                </div>
+              ) : (
+                <div className="overflow-y-auto">
+                  {filteredConversations.map((conv) => (
+                    <div
+                      key={conv.id}
+                      onClick={() => setSelectedConversation(conv.id)}
+                      className={`cursor-pointer border-b border-ivory/5 p-4 transition-colors hover:bg-ivory/5 ${
+                        selectedConversation === conv.id ? 'bg-brand-500/10' : ''
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="relative">
+                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-brand-500 to-purple-500 flex items-center justify-center text-white font-semibold">
+                            {conv.participantAvatar || conv.participantName.substring(0, 2).toUpperCase()}
+                          </div>
+                          {conv.isOnline && (
+                            <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-900 bg-emerald-500" />
+                          )}
                         </div>
 
-                        {conv.eventName && (
-                          <p className="text-xs text-ivory/60 truncate">
-                            {conv.eventName}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold text-ivory truncate">
+                              {conv.participantName}
+                            </h3>
+                            <span className="text-xs text-ivory/60 whitespace-nowrap">
+                              {new Date(conv.lastMessageTime).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </span>
+                          </div>
+
+                          {conv.eventName && (
+                            <p className="text-xs text-ivory/60 truncate">
+                              {conv.eventName}
+                            </p>
+                          )}
+
+                          <p className="mt-1 text-sm text-ivory/80 truncate">
+                            {conv.lastMessage}
                           </p>
-                        )}
 
-                        <p className="mt-1 text-sm text-ivory/80 truncate">
-                          {conv.lastMessage}
-                        </p>
-
-                        <div className="mt-2 flex items-center gap-2">
-                          {conv.isTyping && (
-                            <Badge className="border-brand-500/30 bg-brand-500/10 text-brand-200 text-xs">
-                              typing...
-                            </Badge>
-                          )}
-                          {conv.unreadCount > 0 && (
-                            <Badge className="border-brand-500/30 bg-brand-500/10 text-brand-200 text-xs">
-                              {conv.unreadCount} new
-                            </Badge>
-                          )}
+                          <div className="mt-2 flex items-center gap-2">
+                            {conv.isTyping && (
+                              <Badge className="border-brand-500/30 bg-brand-500/10 text-brand-200 text-xs">
+                                typing...
+                              </Badge>
+                            )}
+                            {conv.unreadCount > 0 && (
+                              <Badge className="border-brand-500/30 bg-brand-500/10 text-brand-200 text-xs">
+                                {conv.unreadCount} new
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
 
-                {filteredConversations.length === 0 && (
-                  <div className="py-12 text-center">
-                    <MessageCircle className="mx-auto mb-4 h-16 w-16 text-ivory/20" />
-                    <p className="text-ivory/60">No conversations found</p>
-                  </div>
-                )}
-              </div>
+                  {filteredConversations.length === 0 && !loading && (
+                    <div className="py-12 text-center">
+                      <MessageCircle className="mx-auto mb-4 h-16 w-16 text-ivory/20" />
+                      <p className="text-ivory/60">No conversations found</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </GlassCard>
           </div>
 
@@ -215,7 +185,7 @@ export default function ChatPage() {
               <ChatInterface
                 conversationId={selectedConversation}
                 currentUserId="user-1"
-                wsUrl="ws://localhost:3001/ws"
+                wsUrl={wsUrl}
                 onCallClick={handleCallClick}
               />
             ) : (

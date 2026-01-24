@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useUserActions } from '@/hooks/use-admin-actions';
 import { Search, UserCheck, UserX, MoreHorizontal } from 'lucide-react';
 import { formatDate, formatRelativeTime } from '@/lib/utils';
+import { apiClient } from '@/lib/api-client';
 
 type UserRow = {
   id: string;
@@ -20,13 +21,6 @@ type UserRow = {
   status: 'ACTIVE' | 'SUSPENDED';
   createdAt: string;
 };
-
-const sampleUsers: UserRow[] = [
-  { id: 'usr_001', email: 'somchai@example.com', name: 'Somchai Jaidee', role: 'BUYER', status: 'ACTIVE', createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 'usr_002', email: 'vendor@example.com', name: 'Maison Lanna', role: 'VENDOR', status: 'ACTIVE', createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 'usr_003', email: 'admin@example.com', name: 'Admin', role: 'ADMIN', status: 'ACTIVE', createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: 'usr_004', email: 'suspended@example.com', name: 'Suspended User', role: 'BUYER', status: 'SUSPENDED', createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString() },
-];
 
 const roleColors: Record<string, string> = {
   BUYER: 'bg-blue-100 text-blue-800',
@@ -43,13 +37,30 @@ export default function AdminUsersPage() {
   const [query, setQuery] = useState('');
   const [filterRole, setFilterRole] = useState<string>('ALL');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
-  const [users, setUsers] = useState<UserRow[]>(sampleUsers);
+  const [users, setUsers] = useState<UserRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
   const [actionReason, setActionReason] = useState('');
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [showUnsuspendDialog, setShowUnsuspendDialog] = useState(false);
 
   const { suspendUser, unsuspendUser } = useUserActions();
+
+  // Load users from API
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const response = await apiClient.get<{ users: UserRow[] }>('/admin/users');
+        setUsers(response.data?.users || []);
+      } catch (error) {
+        console.error('Failed to load users:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, []);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -166,80 +177,85 @@ export default function AdminUsersPage() {
 
       {/* Users Table */}
       <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.length === 0 ? (
+        {loading ? (
+          <div className="py-16 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading users...</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
-                  <p className="text-muted-foreground">No users found</p>
-                </TableCell>
+                <TableHead>ID</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : (
-              rows.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-mono text-xs">{user.id}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>
-                    <Badge className={roleColors[user.role]}>{user.role}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={statusColors[user.status]}>{user.status}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="text-sm">{formatDate(user.createdAt, 'short')}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatRelativeTime(user.createdAt)}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      {user.status === 'ACTIVE' && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setShowSuspendDialog(true);
-                          }}
-                        >
-                          <UserX className="h-4 w-4 mr-1" />
-                          Suspend
-                        </Button>
-                      )}
-                      {user.status === 'SUSPENDED' && (
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setShowUnsuspendDialog(true);
-                          }}
-                        >
-                          <UserCheck className="h-4 w-4 mr-1" />
-                          Unsuspend
-                        </Button>
-                      )}
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {rows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    <p className="text-muted-foreground">No users found</p>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                rows.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-mono text-xs">{user.id}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>
+                      <Badge className={roleColors[user.role]}>{user.role}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={statusColors[user.status]}>{user.status}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="text-sm">{formatDate(user.createdAt, 'short')}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatRelativeTime(user.createdAt)}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        {user.status === 'ACTIVE' && (
+                          <Button
+                            variant="destructive"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowSuspendDialog(true);
+                            }}
+                          >
+                            <UserX className="h-4 w-4 mr-1" />
+                            Suspend
+                          </Button>
+                        )}
+                        {user.status === 'SUSPENDED' && (
+                          <Button
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowUnsuspendDialog(true);
+                            }}
+                          >
+                            <UserCheck className="h-4 w-4 mr-1" />
+                            Unsuspend
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        )}
       </Card>
 
       {/* Suspend Dialog */}

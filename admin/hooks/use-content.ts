@@ -67,10 +67,11 @@ export function useContent(searchQuery = '', filterType?: string, filterStatus?:
       );
 
       if (response.success && response.data?.content) {
+        const content = response.data.content;
         setContent((prev) =>
           prev.map((item) =>
             item.id === id
-              ? { ...response.data.content, status: 'PUBLISHED', publishedAt: new Date().toISOString() }
+              ? { ...content, status: 'PUBLISHED', publishedAt: new Date().toISOString() }
               : item
           )
         );
@@ -90,9 +91,10 @@ export function useContent(searchQuery = '', filterType?: string, filterStatus?:
       );
 
       if (response.success && response.data?.content) {
+        const content = response.data.content;
         setContent((prev) =>
           prev.map((item) =>
-            item.id === id ? { ...response.data.content, status: 'ARCHIVED' } : item
+            item.id === id ? { ...content, status: 'ARCHIVED' } : item
           )
         );
       } else {
@@ -123,8 +125,9 @@ export function useContent(searchQuery = '', filterType?: string, filterStatus?:
       );
 
       if (response.success && response.data?.content) {
-        setContent((prev) => [...prev, response.data.content]);
-        return response.data.content;
+        const content = response.data.content;
+        setContent((prev) => [...prev, content]);
+        return content;
       } else {
         throw new Error('Failed to create content');
       }

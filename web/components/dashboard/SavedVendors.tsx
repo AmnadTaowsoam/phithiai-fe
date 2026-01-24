@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -54,14 +54,14 @@ export function SavedVendors({
             <Button
               variant="ghost"
               onClick={() => setViewMode('grid')}
-              className={viewMode === 'grid' ? 'bg-ivory/10 text-ivory' : 'text-ivory/60'}
+              className={`p-2 ${viewMode === 'grid' ? 'bg-ivory/10 text-ivory' : 'text-ivory/60'}`}
             >
               <IconLayoutGrid size={18} />
             </Button>
             <Button
               variant="ghost"
               onClick={() => setViewMode('list')}
-              className={viewMode === 'list' ? 'bg-ivory/10 text-ivory' : 'text-ivory/60'}
+              className={`p-2 ${viewMode === 'list' ? 'bg-ivory/10 text-ivory' : 'text-ivory/60'}`}
             >
               <IconList size={18} />
             </Button>
@@ -195,7 +195,7 @@ export function SavedVendors({
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-ivory/60">{vendor.category} â€¢ {vendor.zone}</p>
+                      <p className="text-sm text-ivory/60">{vendor.category} • {vendor.zone}</p>
                     </div>
                     <div className="text-right">
                       <div className="font-medium text-ivory">
@@ -209,7 +209,7 @@ export function SavedVendors({
                     <div className="flex gap-2">
                       <Button
                         variant="ghost"
-                        className="text-ivory/60 hover:bg-ivory/5 hover:text-ivory"
+                        className="p-2 text-ivory/60 hover:bg-ivory/5 hover:text-ivory"
                         onClick={(e) => {
                           e.stopPropagation();
                           onContact?.(vendor);
@@ -219,7 +219,7 @@ export function SavedVendors({
                       </Button>
                       <Button
                         variant="ghost"
-                        className="text-red-300 hover:bg-red-500/10 hover:text-red-200"
+                        className="p-2 text-red-300 hover:bg-red-500/10 hover:text-red-200"
                         onClick={(e) => {
                           e.stopPropagation();
                           onUnsave?.(vendor.id);

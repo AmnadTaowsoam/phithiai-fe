@@ -81,10 +81,11 @@ export function useSettings(category?: string, isPublic?: boolean) {
       );
 
       if (response.success && response.data) {
+        const setting = response.data.setting;
         setSettings((prev) =>
-          prev.map((s) => (s.key === key ? response.data.setting : s))
+          prev.map((s) => (s.key === key ? setting : s))
         );
-        return response.data.setting;
+        return setting;
       }
       throw new Error('Failed to update setting');
     } catch (err) {
@@ -114,7 +115,8 @@ export function useSettings(category?: string, isPublic?: boolean) {
           setSettings(refreshResponse.data.settings || []);
         }
 
-        return response.data.result;
+        const result = response.data.result;
+        return result;
       }
       throw new Error('Failed to bulk update settings');
     } catch (err) {
@@ -131,8 +133,9 @@ export function useSettings(category?: string, isPublic?: boolean) {
       );
 
       if (response.success && response.data) {
-        setSettings((prev) => [...prev, response.data.setting]);
-        return response.data.setting;
+        const setting = response.data.setting;
+        setSettings((prev) => [...prev, setting]);
+        return setting;
       }
       throw new Error('Failed to create setting');
     } catch (err) {
@@ -159,10 +162,11 @@ export function useSettings(category?: string, isPublic?: boolean) {
       );
 
       if (response.success && response.data) {
+        const setting = response.data.setting;
         setSettings((prev) =>
-          prev.map((s) => (s.key === key ? response.data.setting : s))
+          prev.map((s) => (s.key === key ? setting : s))
         );
-        return response.data.setting;
+        return setting;
       }
       throw new Error('Failed to reset setting');
     } catch (err) {

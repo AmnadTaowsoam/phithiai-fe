@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconFileText, IconSignature, IconCheck, IconAlertCircle, IconChevronRight } from '@tabler/icons-react';
 import { LegalReader } from '../../components/contract-signing/LegalReader';
@@ -9,6 +9,7 @@ import { SigningProgress } from '../../components/contract-signing/SigningProgre
 import { ContractReview } from '../../components/contract-signing/ContractReview';
 import { Contract } from '../../components/contract-signing/types';
 import type { SigningMarker, ContractParty } from '../../components/contract-signing/types';
+import { ContractsAPI } from '@/lib/api/contracts';
 
 export default function ContractSigningPage() {
   const [contract, setContract] = useState<Contract | null>(null);
@@ -20,77 +21,31 @@ export default function ContractSigningPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Load contract data
+  // Get contract ID from URL
+  const getContractId = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+  };
+
+  // Load contract data from API
   useEffect(() => {
-    // Mock data - replace with API call
-    setContract({
-      id: 'CTR-2024-001',
-      title: 'Thai Wedding Ceremony Service Agreement',
-      content: `
-        <h1>THAI WEDDING CEREMONY SERVICE AGREEMENT</h1>
-        <p><strong>Date:</strong> January 20, 2026</p>
-        
-        <h2>1. PARTIES TO THE AGREEMENT</h2>
-        <p>This Agreement is entered into between:</p>
-        <p><strong>Client:</strong> [Client Name] (hereinafter referred to as "Client")</p>
-        <p><strong>Vendor:</strong> [Vendor Name] (hereinafter referred to as "Vendor")</p>
-        
-        <h2>2. SERVICES TO BE PROVIDED</h2>
-        <p>The Vendor agrees to provide the following services:</p>
-        <ul>
-          <li>Traditional Thai wedding ceremony consultation</li>
-          <li>Officiant services for the main ceremony</li>
-          <li>Cultural ritual guidance and preparation</li>
-          <li>Traditional music arrangement</li>
-          <li>Photography and videography services</li>
-        </ul>
-        
-        <h2>3. PAYMENT TERMS</h2>
-        <p><strong>Total Amount:</strong> THB 150,000</p>
-        <p><strong>Payment Schedule:</strong></p>
-        <ul>
-          <li>Deposit (30%): THB 45,000 - Due upon signing</li>
-          <li>Second Payment (40%): THB 60,000 - Due 30 days before ceremony</li>
-          <li>Final Payment (30%): THB 45,000 - Due on ceremony day</li>
-        </ul>
-        
-        <h2>4. CANCELLATION POLICY</h2>
-        <p>Cancellations made more than 60 days before the ceremony will receive a 80% refund of the deposit.</p>
-        <p>Cancellations made between 30-60 days before the ceremony will receive a 50% refund.</p>
-        <p>Cancellations made less than 30 days before the ceremony are non-refundable.</p>
-        
-        <h2>5. LIABILITY AND INDEMNIFICATION</h2>
-        <p>The Vendor shall not be liable for any delays or failures caused by circumstances beyond their control.</p>
-        <p>The Client agrees to indemnify the Vendor against any claims arising from the Client's actions.</p>
-        
-        <h2>6. MODIFICATIONS TO THE AGREEMENT</h2>
-        <p>Any modifications to this Agreement must be made in writing and signed by both parties.</p>
-        
-        <h2>7. GOVERNING LAW</h2>
-        <p>This Agreement shall be governed by and construed in accordance with the laws of the Kingdom of Thailand.</p>
-        
-        <h2>8. ENTIRE AGREEMENT</h2>
-        <p>This Agreement constitutes the entire understanding between the parties and supersedes all prior agreements.</p>
-        
-        <div class="signature-section">
-          <h3>SIGNATURES</h3>
-          <p>By signing below, both parties acknowledge that they have read, understood, and agreed to all terms and conditions outlined in this Agreement.</p>
-        </div>
-      `,
-      parties: [
-        { id: 'party-1', name: 'Client', role: 'user', status: 'pending' },
-        { id: 'party-2', name: 'Vendor', role: 'vendor', status: 'signed', signedAt: new Date('2026-01-18') },
-        { id: 'party-3', name: 'Witness 1', role: 'witness', status: 'pending' },
-      ],
-      markers: [
-        { id: 'marker-1', type: 'signature', partyId: 'party-1', position: 15, label: 'Client Initial', required: true },
-        { id: 'marker-2', type: 'signature', partyId: 'party-1', position: 100, label: 'Client Signature', required: true },
-        { id: 'marker-3', type: 'date', partyId: 'party-1', position: 100, label: 'Date', required: true },
-        { id: 'marker-4', type: 'signature', partyId: 'party-3', position: 100, label: 'Witness Signature', required: false },
-      ],
-      createdAt: new Date('2026-01-15'),
-      expiresAt: new Date('2026-02-15'),
-    });
+    const contractId = getContractId();
+    if (contractId) {
+      const loadContract = async () => {
+        try {
+          const token = localStorage.getItem('access_token');
+          if (token) {
+            const contractData = await ContractsAPI.getContract(contractId, token);
+            setContract(contractData);
+          }
+        } catch (err) {
+          console.error('Failed to load contract:', err);
+          setError('Failed to load contract. Please try again.');
+        }
+      };
+
+      loadContract();
+    }
   }, []);
 
   const handleScrollToMarker = (index: number) => {
@@ -113,10 +68,20 @@ export default function ContractSigningPage() {
     setError(null);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setSuccess(true);
+      const contractId = getContractId();
+      const token = localStorage.getItem('access_token');
+      
+      if (contract && token) {
+        // Initiate e-signature process
+        await ContractsAPI.initiateESignature({
+          contractId,
+          returnUrl: `${window.location.origin}/contract-signing?id=${contractId}`,
+        }, token);
+        
+        setSuccess(true);
+      }
     } catch (err) {
+      console.error('Failed to submit contract:', err);
       setError('Failed to submit contract. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -130,7 +95,6 @@ export default function ContractSigningPage() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">Loading contract...</p>
         </div>
-      </div>
     );
   }
 
@@ -140,7 +104,7 @@ export default function ContractSigningPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center"
+          className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full"
         >
           <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
             <IconCheck className="w-10 h-10 text-green-600 dark:text-green-400" />
@@ -176,7 +140,7 @@ export default function ContractSigningPage() {
                 <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Contract Signing
                 </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   {contract.title}
                 </p>
               </div>
@@ -240,7 +204,7 @@ export default function ContractSigningPage() {
                       whileTap={{ scale: !showReview ? 0.98 : 1 }}
                       className={`w-full flex items-center gap-3 p-4 rounded-xl transition-all ${
                         isCurrent
-                          ? 'bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 border-2 border-purple-500'
+                          ? 'bg-gradient-to-r from-purple-100 to-pink-100 border-2 border-purple-500'
                           : isCompleted
                           ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-500'
                           : 'bg-gray-50 dark:bg-gray-700/50 border-2 border-gray-200 dark:border-gray-600'
@@ -251,64 +215,75 @@ export default function ContractSigningPage() {
                           ? 'bg-green-500'
                           : isCurrent
                           ? 'bg-purple-500'
-                          : 'bg-gray-300 dark:bg-gray-600'
+                          : 'bg-gray-300'
                       }`}>
                         {isCompleted ? (
                           <IconCheck className="w-5 h-5 text-white" />
                         ) : (
-                          <span className="text-white text-sm font-semibold">{index + 1}</span>
+                          <span className="text-white font-semibold">{index + 1}</span>
                         )}
                       </div>
-                      <div className="flex-1 text-left">
+                      <div className="flex-1">
                         <p className={`font-medium ${
                           isCurrent ? 'text-purple-700 dark:text-purple-300' : 'text-gray-900 dark:text-white'
                         }`}>
                           {marker.label}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className={`text-sm text-gray-600 dark:text-gray-400`}>
                           {party?.name} - {marker.type}
                         </p>
                       </div>
                       {marker.required && (
-                        <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-full">
+                        <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">
                           Required
                         </span>
                       )}
                     </motion.button>
                   );
                 })}
-              </div>
 
-              {/* Party Status */}
-              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                  Party Status
-                </h3>
-                <div className="space-y-2">
-                  {contract.parties.map((party) => (
-                    <div key={party.id} className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">{party.name}</span>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        party.status === 'signed'
-                          ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
-                          : party.status === 'rejected'
-                          ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                          : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400'
-                      }`}>
-                        {party.status}
-                      </span>
-                    </div>
-                  ))}
+                {/* Party Status */}
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                    Party Status
+                  </h3>
+                  <div className="space-y-2">
+                    {contract.parties.map((party) => {
+                      const statusColors = {
+                        pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400',
+                        signed: 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400',
+                        rejected: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
+                      };
+
+                      return (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-900 dark:text-white">{party.name}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${statusColors[party.status as keyof typeof statusColors]}`}>
+                            {party.status.toUpperCase()}
+                          </span>
+                          {party.signedAt && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                              {new Date(party.signedAt).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
 
-              {/* Warning */}
-              <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-800">
-                <div className="flex items-start gap-2">
-                  <IconAlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                    Please review all terms carefully before signing. By signing, you agree to all conditions outlined in this contract.
-                  </p>
+                {/* Warning */}
+                <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-800">
+                  <div className="flex items-start gap-2">
+                    <IconAlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                      Please review all terms carefully before signing. By signing, you agree to all conditions outlined in this contract.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

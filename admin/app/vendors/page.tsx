@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Search, Eye, CheckCircle, XCircle, Clock, Ban, ShieldCheck } from 'lucide-react';
 import { formatDate, formatRelativeTime } from '@/lib/utils';
 import { useVendors, useVendorActions } from '@/hooks/use-vendors';
+import { apiClient } from '@/lib/api-client';
 
 type VendorRow = {
   id: string;
@@ -31,92 +32,6 @@ type VendorRow = {
   bannedAt?: string;
   banReason?: string;
 };
-
-const initialVendors: VendorRow[] = [
-  {
-    id: 'ven_001',
-    name: 'Maison Lanna Collective',
-    slug: 'maison-lanna',
-    status: 'PENDING',
-    category: 'decoration',
-    zone: 'north',
-    rating: 4.9,
-    reviewCount: 87,
-    submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    documents: {
-      businessLicense: 'BL-001',
-      taxId: 'TAX-001',
-      portfolio: 'PORT-001',
-    },
-  },
-  {
-    id: 'ven_002',
-    name: 'Siam Symphony',
-    slug: 'siam-symphony',
-    status: 'APPROVED',
-    category: 'entertainment',
-    zone: 'central',
-    rating: 4.7,
-    reviewCount: 124,
-    submittedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    documents: {
-      businessLicense: 'BL-002',
-      taxId: 'TAX-002',
-    },
-  },
-  {
-    id: 'ven_003',
-    name: 'Chiang Mai Floral Art',
-    slug: 'chiang-mai-floral',
-    status: 'UNDER_REVIEW',
-    category: 'decoration',
-    zone: 'north',
-    submittedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    documents: {
-      businessLicense: 'BL-003',
-    },
-  },
-  {
-    id: 'ven_004',
-    name: 'Thai Traditional Music',
-    slug: 'thai-traditional-music',
-    status: 'PENDING',
-    category: 'entertainment',
-    zone: 'north',
-    submittedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    documents: {
-      businessLicense: 'BL-004',
-      taxId: 'TAX-004',
-      portfolio: 'PORT-004',
-    },
-  },
-  {
-    id: 'ven_005',
-    name: 'Bangkok Catering Co.',
-    slug: 'bangkok-catering',
-    status: 'REJECTED',
-    category: 'catering',
-    zone: 'central',
-    submittedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    documents: {
-      businessLicense: 'BL-005',
-    },
-    notes: 'Missing required portfolio documentation',
-  },
-  {
-    id: 'ven_006',
-    name: 'Banned Vendor',
-    slug: 'banned-vendor',
-    status: 'BANNED',
-    category: 'catering',
-    zone: 'central',
-    rating: 3.2,
-    reviewCount: 15,
-    submittedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-    bannedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    banReason: 'Violation of terms of service',
-  },
-];
 
 const statusColors: Record<string, 'default' | 'secondary' | 'success' | 'destructive' | 'warning'> = {
   PENDING: 'secondary',
@@ -152,7 +67,8 @@ const zoneLabels: Record<string, string> = {
 export default function AdminVendorsPage() {
   const [query, setQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
-  const [vendors, setVendors] = useState(initialVendors);
+  const [vendors, setVendors] = useState<VendorRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedVendor, setSelectedVendor] = useState<VendorRow | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectDialog, setShowRejectDialog] = useState(false);
@@ -162,6 +78,22 @@ export default function AdminVendorsPage() {
   const [banDuration, setBanDuration] = useState<number | undefined>(undefined);
 
   const { banVendor, unbanVendor } = useVendorActions();
+
+  // Load vendors from API
+  useEffect(() => {
+    const loadVendors = async () => {
+      try {
+        const response = await apiClient.get<{ vendors: VendorRow[] }>('/admin/vendors');
+        setVendors(response.data?.vendors || []);
+      } catch (error) {
+        console.error('Failed to load vendors:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadVendors();
+  }, []);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -311,174 +243,174 @@ export default function AdminVendorsPage() {
 
       {/* Vendors Table */}
       <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>ชื่อวอเตอร์</TableHead>
-              <TableHead>หมวดหมู่</TableHead>
-              <TableHead>ภูมิภาค</TableHead>
-              <TableHead>สถานะ</TableHead>
-              <TableHead>เอกสาร</TableHead>
-              <TableHead>ส่งเมื่อ</TableHead>
-              <TableHead className="text-right">การดำเนินการ</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.length === 0 ? (
+        {loading ? (
+          <div className="py-16 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading vendors...</p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8">
-                  <p className="text-muted-foreground">ไม่พบวอเตอร์</p>
-                </TableCell>
+                <TableHead>ID</TableHead>
+                <TableHead>ชื่อวอเตอร์</TableHead>
+                <TableHead>หมวดหมู่</TableHead>
+                <TableHead>ภูมิภาค</TableHead>
+                <TableHead>สถานะ</TableHead>
+                <TableHead>เอกสาร</TableHead>
+                <TableHead>ส่งเมื่อ</TableHead>
+                <TableHead className="text-right">การดำเนินการ</TableHead>
               </TableRow>
-            ) : (
-              rows.map((vendor) => (
-                <TableRow key={vendor.id}>
-                  <TableCell className="font-mono text-xs">{vendor.id}</TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{vendor.name}</p>
-                      <p className="text-sm text-muted-foreground">{vendor.slug}</p>
-                      {vendor.rating && (
-                        <p className="text-xs text-muted-foreground">
-                          ⭐ {vendor.rating} ({vendor.reviewCount} รีวิว)
-                        </p>
-                      )}
-                      {vendor.status === 'BANNED' && vendor.bannedAt && (
-                        <p className="text-xs text-red-600">
-                          Banned: {formatDate(vendor.bannedAt, 'short')}
-                        </p>
-                      )}
-                      {vendor.status === 'BANNED' && vendor.banReason && (
-                        <p className="text-xs text-red-600">
-                          Reason: {vendor.banReason}
-                        </p>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>{categoryLabels[vendor.category] || vendor.category}</TableCell>
-                  <TableCell>{zoneLabels[vendor.zone] || vendor.zone}</TableCell>
-                  <TableCell>
-                    <Badge variant={statusColors[vendor.status]}>{statusLabels[vendor.status]}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-1">
-                      {vendor.documents?.businessLicense && (
-                        <Badge variant="outline" className="text-xs">
-                          ✓ ใบอนุญาตประกอบธุรกิจ
-                        </Badge>
-                      )}
-                      {vendor.documents?.taxId && (
-                        <Badge variant="outline" className="text-xs">
-                          ✓ เลขประจำตัวผู้เสียภาษี
-                        </Badge>
-                      )}
-                      {vendor.documents?.portfolio && (
-                        <Badge variant="outline" className="text-xs">
-                          ✓ ผลงาน
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="text-sm">{formatDate(vendor.submittedAt, 'short')}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatRelativeTime(vendor.submittedAt)}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      {vendor.status === 'PENDING' && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => updateStatus(vendor.id, 'UNDER_REVIEW')}
-                          >
-                            ตรวจสอบ
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="bg-green-600 hover:bg-green-700"
-                            onClick={() => updateStatus(vendor.id, 'APPROVED')}
-                          >
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            อนุมัติ
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              setSelectedVendor(vendor);
-                              setShowRejectDialog(true);
-                            }}
-                          >
-                            <XCircle className="h-4 w-4 mr-1" />
-                            ปฏิเสธ
-                          </Button>
-                        </>
-                      )}
-                      {vendor.status === 'UNDER_REVIEW' && (
-                        <>
-                          <Button
-                            size="sm"
-                            className="bg-green-600 hover:bg-green-700"
-                            onClick={() => updateStatus(vendor.id, 'APPROVED')}
-                          >
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            อนุมัติ
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              setSelectedVendor(vendor);
-                              setShowRejectDialog(true);
-                            }}
-                          >
-                            <XCircle className="h-4 w-4 mr-1" />
-                            ปฏิเสธ
-                          </Button>
-                        </>
-                      )}
-                      {vendor.status === 'APPROVED' && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => {
-                            setSelectedVendor(vendor);
-                            setShowBanDialog(true);
-                          }}
-                        >
-                          <Ban className="h-4 w-4 mr-1" />
-                          ระงับ
-                        </Button>
-                      )}
-                      {vendor.status === 'BANNED' && (
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700"
-                          onClick={() => {
-                            setSelectedVendor(vendor);
-                            setShowUnbanDialog(true);
-                          }}
-                        >
-                          <ShieldCheck className="h-4 w-4 mr-1" />
-                          ยกเลิกระงับ
-                        </Button>
-                      )}
-                    </div>
+            </TableHeader>
+            <TableBody>
+              {rows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8">
+                    <p className="text-muted-foreground">ไม่พบวอเตอร์</p>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                rows.map((vendor) => (
+                  <TableRow key={vendor.id}>
+                    <TableCell className="font-mono text-xs">{vendor.id}</TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{vendor.name}</p>
+                        <p className="text-sm text-muted-foreground">{vendor.slug}</p>
+                        {vendor.rating && (
+                          <p className="text-xs text-muted-foreground">
+                            ⭐ {vendor.rating} ({vendor.reviewCount} รีวิว)
+                          </p>
+                        )}
+                        {vendor.status === 'BANNED' && vendor.bannedAt && (
+                          <p className="text-xs text-red-600">
+                            Banned: {formatDate(vendor.bannedAt, 'short')}
+                          </p>
+                        )}
+                        {vendor.status === 'BANNED' && vendor.banReason && (
+                          <p className="text-xs text-red-600">
+                            Reason: {vendor.banReason}
+                          </p>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{categoryLabels[vendor.category] || vendor.category}</TableCell>
+                    <TableCell>{zoneLabels[vendor.zone] || vendor.zone}</TableCell>
+                    <TableCell>
+                      <Badge variant={statusColors[vendor.status]}>{statusLabels[vendor.status]}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        {vendor.documents?.businessLicense && (
+                          <Badge variant="outline" className="text-xs">
+                            ✓ ใบอนุญาตประกอบธุรกิจ
+                          </Badge>
+                        )}
+                        {vendor.documents?.taxId && (
+                          <Badge variant="outline" className="text-xs">
+                            ✓ เลขประจำตัวผู้เสียภาษี
+                          </Badge>
+                        )}
+                        {vendor.documents?.portfolio && (
+                          <Badge variant="outline" className="text-xs">
+                            ✓ ผลงาน
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="text-sm">{formatDate(vendor.submittedAt, 'short')}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatRelativeTime(vendor.submittedAt)}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        {vendor.status === 'PENDING' && (
+                          <>
+                            <Button
+                              variant="secondary"
+                              onClick={() => updateStatus(vendor.id, 'UNDER_REVIEW')}
+                            >
+                              ตรวจสอบ
+                            </Button>
+                            <Button
+                              className="bg-green-600 hover:bg-green-700"
+                              onClick={() => updateStatus(vendor.id, 'APPROVED')}
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              อนุมัติ
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={() => {
+                                setSelectedVendor(vendor);
+                                setShowRejectDialog(true);
+                              }}
+                            >
+                              <XCircle className="h-4 w-4 mr-1" />
+                              ปฏิเสธ
+                            </Button>
+                          </>
+                        )}
+                        {vendor.status === 'UNDER_REVIEW' && (
+                          <>
+                            <Button
+                              className="bg-green-600 hover:bg-green-700"
+                              onClick={() => updateStatus(vendor.id, 'APPROVED')}
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              อนุมัติ
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={() => {
+                                setSelectedVendor(vendor);
+                                setShowRejectDialog(true);
+                              }}
+                            >
+                              <XCircle className="h-4 w-4 mr-1" />
+                              ปฏิเสธ
+                            </Button>
+                          </>
+                        )}
+                        {vendor.status === 'APPROVED' && (
+                          <Button
+                            variant="destructive"
+                            onClick={() => {
+                              setSelectedVendor(vendor);
+                              setShowBanDialog(true);
+                            }}
+                          >
+                            <Ban className="h-4 w-4 mr-1" />
+                            ระงับ
+                          </Button>
+                        )}
+                        {vendor.status === 'BANNED' && (
+                          <Button
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => {
+                              setSelectedVendor(vendor);
+                              setShowUnbanDialog(true);
+                            }}
+                          >
+                            <ShieldCheck className="h-4 w-4 mr-1" />
+                            ยกเลิกระงับ
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        )}
       </Card>
 
       {/* Reject Dialog */}
